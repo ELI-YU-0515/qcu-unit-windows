@@ -12,9 +12,6 @@ namespace qcu_unit_windows
                 .ConfigureFonts(fonts =>
                 {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                fonts.AddFont("Poppins-Regular.ttf", "Poppins");
-                fonts.AddFont("Poppins-Bold.ttf", "PoppinsBold");
-                fonts.AddFont("Poppins-SemiBold.ttf", "PoppinsSemiBold");
                 });
 
             builder.Services.AddMauiBlazorWebView();

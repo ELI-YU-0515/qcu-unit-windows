@@ -1,1 +1,16 @@
-﻿
+﻿.home-layout {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    background: linear-gradient(to right, #3674e1, #a1c4fd);
+    font-family: 'Poppins';
+    margin: 0;
+}
+.home-sidebar {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 10px 10px 10px;
+}
+.txt1 {
+    font-size: 20px;
+}

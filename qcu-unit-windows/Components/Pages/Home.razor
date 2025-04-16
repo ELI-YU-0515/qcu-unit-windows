@@ -1,0 +1,18 @@
+﻿@page "/home"
+@using qcu_unit_windows.Components.Layout
+@layout DashboardLayout
+@inject NavigationManager Navigation
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+
+<input id="login-button" type="button" value="LOGIN" @onclick="qcuUnitLogin" />
+
+@code {
+    private void qcuUnitLogin()
+    {
+        Navigation.NavigateTo("/login"); // or "/" if that's your Home.razor route
+    }
+}

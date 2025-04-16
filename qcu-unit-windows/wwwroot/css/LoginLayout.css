@@ -1,0 +1,99 @@
+﻿/* Layout wrapper - full screen, center aligned */
+.login-layout {
+    display: flex;
+    justify-content: center; /* Horizontally center */
+    align-items: center; /* Vertically center */
+    height: 100vh; /* Full viewport height */
+    background: linear-gradient(to right, #3674e1, #a1c4fd);
+    font-family: Arial, sans-serif;
+    margin: 0; /* Ensure no margin around */
+}
+
+/* Login box container */
+.login-box {
+    display: flex; /* Enable flexbox */
+    flex-direction: column; /* Stack items vertically */
+    justify-content: center; /* Vertically center the items */
+    align-items: center; /* Horizontally center the items */
+    padding: 2rem;
+    width: 350px; /* Fixed width */
+    height: 400px;
+    border-radius: 15px; /* Rounded corners */
+    background: rgba(255, 255, 255, 0.4); /* 80% transparent white */
+    backdrop-filter: blur(10px); /* Frosted glass blur */
+    -webkit-backdrop-filter: blur(10px); /* For Safari */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); /* Shadow effect */
+    color: #333;
+    text-align: center; /* Center text within the box */
+    margin: 0; /* Ensure no extra margin */
+}
+
+    /* Input styling */
+    .login-box input {
+        width: 100%; /* Full width */
+        padding: 0.75rem; /* Spacing */
+        margin: 0.5rem 0; /* Spacing between fields */
+        border-radius: 10px; /* Rounded edges */
+        border: 1px solid #ccc; /* Light border */
+        background-color: rgba(255, 255, 255, 0.8); /* Light transparent background */
+        font-size: 1rem;
+        outline: none;
+        transition: 0.3s;
+    }
+
+        .login-box input:focus {
+            border-color: #3b82f6; /* Blue border on focus */
+            box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); /* Focus effect */
+        }
+
+
+/* Button styling */
+#login-button {
+    background-color: #3674e1; /* Base green color */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 12px; /* Rounded corners */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+    /* Hover effect */
+    #login-button:hover {
+        background-color: #4383f3; /* Slightly darker green for hover */
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow on hover */
+    }
+
+    /* Focus effect */
+    #login-button:focus {
+        outline: none; /* Remove default outline */
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* Focus shadow with blue tint */
+    }
+
+    #login-button:active {
+        transform: scale(0.98); /* Slightly shrink the button to show it's being clicked */
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Add a deeper shadow when clicked */
+        background-color: #2d60b9;
+    }
+
+.password-instructions {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, .65); /* Semi-transparent background */
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    width: 300px;
+    text-align: center;
+    font-size: 14px;
+    z-index: 10;
+}

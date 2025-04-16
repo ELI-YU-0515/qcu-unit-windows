@@ -1,0 +1,37 @@
+﻿@page "/"
+@page "/login"
+@using qcu_unit_windows.Components.Layout
+@layout LoginLayout
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<h1 style="text-align:center;">LOGIN</h1>
+<p>Welcome to QCU-REPO</p>
+<input id="login-id" placeholder="Student ID ex. 20-0000" type="text" />
+<input id="login-password" placeholder="Password" type="password" @onfocus="ShowPasswordInstructions" @onblur="HidePasswordInstructions" />
+
+<!-- Floating Instructions Box -->
+<div id="password-instructions" class="password-instructions" style="display:none;">
+    <p>Password format should be like this:</p>
+    <p><strong>QCU-STUDENTID-surname</strong></p>
+    <p><strong>Example: QCU-201234-guzman</strong></p>
+</div>
+
+<input id="login-button" type="button" value="LOGIN" @onclick="qcuUnitDashboard" />
+
+@code {
+    private async Task ShowPasswordInstructions()
+    {
+        await JSRuntime.InvokeVoidAsync("showPasswordInstructions");
+    }
+
+    private async Task HidePasswordInstructions()
+    {
+        await JSRuntime.InvokeVoidAsync("hidePasswordInstructions");
+    }
+
+    private void qcuUnitDashboard()
+    {
+        Navigation.NavigateTo("/home");
+    }
+}

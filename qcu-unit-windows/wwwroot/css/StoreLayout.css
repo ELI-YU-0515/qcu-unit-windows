@@ -1,0 +1,26 @@
+﻿.txt1-headline {
+    font-size: 25px;
+    color: white;
+    font-weight: 600;
+}
+.store-layout {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    background: linear-gradient(to right, #3674e1, #a1c4fd);
+    font-family: 'Poppins';
+    margin: 0;
+}
+.store-sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 200px;
+    padding: 20px 20px 20px 20px;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    color: #333;
+    gap: 20px;
+}

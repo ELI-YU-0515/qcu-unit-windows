@@ -10,7 +10,7 @@
     style="color:white;
                font-weight:600;
                font-size:25px;">QCU Repo</h1>
-
+    <input class="logout-button" input="button" value="(Temp)StorePage" @onclick="qcuUnitStore"/>
     <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
 </div>
 
@@ -27,11 +27,11 @@
             <p>Application 1</p>
         </div>
         <div class="home-content-container">
-             <p>Application 2</p>
+            <p>Application 2</p>
         </div>
         <div class="home-content-container">
-             <p>Application 3</p>
-		</div>
+            <p>Application 3</p>
+        </div>
     </div>
 </div>
 
@@ -43,5 +43,9 @@
     private void qcuUnitLogin()
     {
         Navigation.NavigateTo("/login"); // or "/" if that's your Home.razor route
+    }
+    private void qcuUnitStore()
+    {
+        Navigation.NavigateTo("/Store");
     }
 }

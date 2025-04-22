@@ -137,3 +137,8 @@
 .txt1 {
     font-size: 20px;
 }
+.txt1-headline {
+    font-size: 25px;
+    color: white;
+    font-weight: 600;
+}

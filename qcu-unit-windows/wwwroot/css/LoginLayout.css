@@ -1,95 +1,109 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-/* Layout wrapper - full screen, center aligned */
+﻿@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 .login-layout {
-    display: flex;
-    justify-content: center; /* Horizontally center */
-    align-items: center; /* Vertically center */
-    height: 100vh; /* Full viewport height */
+    font-family: 'Poppins', sans-serif;
     background: linear-gradient(to right, #3674e1, #a1c4fd);
-/*    font-family: Arial, sans-serif;*/
-    font-family: 'Poppins';
-    margin: 0; /* Ensure no margin around */
+    scroll-behavior: smooth;
+    margin: 0;
+    padding: 0;
 }
 
-/* Login box container */
+/* Welcome section takes full screen height */
+.welcome-box {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0 20px;
+}
+
+    .welcome-box h1 {
+        font-size: 2.5rem;
+        color: white;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-box p {
+        font-size: 1.1rem;
+        color: white;
+        max-width: 90%;
+        margin: 0.25rem 0;
+    }
+
+/* Login section also takes full screen */
 .login-box {
-    display: flex; /* Enable flexbox */
-    flex-direction: column; /* Stack items vertically */
-    justify-content: center; /* Vertically center the items */
-    align-items: center; /* Horizontally center the items */
+    height: 500px;
     padding: 2rem;
-    width: 350px; /* Fixed width */
-    height: 400px;
-    border-radius: 15px; /* Rounded corners */
-    background: rgba(255, 255, 255, 0.4); /* 80% transparent white */
-    backdrop-filter: blur(10px); /* Frosted glass blur */
-    -webkit-backdrop-filter: blur(10px); /* For Safari */
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); /* Shadow effect */
-    color: #333;
-    text-align: center; /* Center text within the box */
-    margin: 0; /* Ensure no extra margin */
+    max-width: 90%;
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.4);
 }
 
-    /* Input styling */
+.invis-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+    /* Input styles */
     .login-box input {
-        width: 100%; /* Full width */
-        padding: 0.75rem; /* Spacing */
-        margin: 0.5rem 0; /* Spacing between fields */
-        border-radius: 10px; /* Rounded edges */
-        border: 1px solid #ccc; /* Light border */
-        background-color: rgba(255, 255, 255, 0.8); /* Light transparent background */
+        width: 100%;
+        padding: 0.75rem;
+        margin: 0.5rem 0;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        background-color: rgba(255, 255, 255, 0.8);
         font-size: 1rem;
         outline: none;
         transition: 0.3s;
     }
 
         .login-box input:focus {
-            border-color: #3b82f6; /* Blue border on focus */
-            box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); /* Focus effect */
+            border-color: #3b82f6;
+            box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
         }
-
 
 /* Button styling */
 #login-button {
-    background-color: #3674e1; /* Base green color */
+    background-color: #3674e1;
     border: none;
     color: white;
     padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
     font-size: 16px;
     margin: 10px 0;
     cursor: pointer;
-    border-radius: 12px; /* Rounded corners */
-    transition: all 0.3s ease; /* Smooth transition for hover effects */
+    border-radius: 12px;
+    transition: all 0.3s ease;
 }
 
-    /* Hover effect */
     #login-button:hover {
-        background-color: #4383f3; /* Slightly darker green for hover */
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow on hover */
+        background-color: #4383f3;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    /* Focus effect */
     #login-button:focus {
-        outline: none; /* Remove default outline */
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* Focus shadow with blue tint */
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
     }
 
     #login-button:active {
-        transform: scale(0.98); /* Slightly shrink the button to show it's being clicked */
-        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Add a deeper shadow when clicked */
+        transform: scale(0.98);
         background-color: #2d60b9;
     }
 
+/* Optional Tooltip */
 .password-instructions {
-    display: none; /* Hidden by default */
+    display: none;
     position: absolute;
     top: 50px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, .65); /* Semi-transparent background */
+    background-color: rgba(0, 0, 0, .65);
     color: white;
     padding: 10px;
     border-radius: 8px;
@@ -98,4 +112,25 @@
     text-align: center;
     font-size: 14px;
     z-index: 10;
+}
+
+/* 📱 Mobile Optimization */
+@media (max-width: 600px) {
+    .welcome-box h1 {
+        font-size: 1.8rem;
+    }
+
+    .welcome-box p {
+        font-size: 1rem;
+    }
+
+    .login-box > * {
+        width: 90%;
+        padding: 1.5rem;
+    }
+
+    #login-button {
+        font-size: 14px;
+        padding: 12px 24px;
+    }
 }

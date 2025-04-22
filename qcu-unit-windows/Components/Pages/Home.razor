@@ -6,18 +6,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <div class="home-sidebar">
-    <h1 class="txt1"
-    style="color:white;
-               font-weight:600;
-               font-size:25px;">QCU Repo</h1>
-    <input class="logout-button" input="button" value="(Temp)StorePage" @onclick="qcuUnitStore"/>
+    <h1 class="txt1">QCU Repo</h1>
+    <input class="logout-button" type="button" value="(Temp)StorePage" @onclick="qcuUnitStore" />
     <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
 </div>
 
 <div class="home-layout2">
     <section class="search-section">
         <div class="search-bar">
-            <input type="text" placeholder="Search..."/>
+            <input type="text" placeholder="Search..." />
             <button>Search</button>
         </div>
     </section>
@@ -35,15 +32,12 @@
     </div>
 </div>
 
-
-
-
-
 @code {
     private void qcuUnitLogin()
     {
-        Navigation.NavigateTo("/login"); // or "/" if that's your Home.razor route
+        Navigation.NavigateTo("/login");
     }
+
     private void qcuUnitStore()
     {
         Navigation.NavigateTo("/Store");

@@ -1,4 +1,5 @@
 // site.js
+
 window.showPasswordInstructions = function () {
     var instructionsDiv = document.getElementById("password-instructions");
     if (instructionsDiv) {
@@ -12,3 +13,4 @@ window.hidePasswordInstructions = function () {
         instructionsDiv.style.display = "none";
     }
 };
+

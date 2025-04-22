@@ -12,16 +12,3 @@ window.hidePasswordInstructions = function () {
         instructionsDiv.style.display = "none";
     }
 };
-
-
-function scrollToLoginSection() {
-    const section = document.getElementById('login-section');
-    if (section) {
-        section.scrollIntoView({ behavior: 'smooth' });
-    }
-}
-
-// Set light/dark theme
-function setTheme(theme) {
-    document.documentElement.setAttribute("data-theme", theme);
-}

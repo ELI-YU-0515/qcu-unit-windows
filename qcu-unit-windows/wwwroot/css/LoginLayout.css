@@ -8,7 +8,7 @@
     padding: 0;
 }
 
-/* Welcome section takes full screen height */
+/* Welcome Section */
 .welcome-box {
     height: 100vh;
     display: flex;
@@ -32,43 +32,48 @@
         margin: 0.25rem 0;
     }
 
-/* Login section also takes full screen */
+/* Login Box */
 .login-box {
-    height: 500px;
     padding: 2rem;
+    width: 400px;
     max-width: 90%;
     backdrop-filter: blur(10px);
     border-radius: 15px;
     background: rgba(255, 255, 255, 0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
+/* Invisible Block for Centering Login Box */
 .invis-block {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     height: 100vh;
 }
 
-    /* Input styles */
-    .login-box input {
-        width: 100%;
-        padding: 0.75rem;
-        margin: 0.5rem 0;
-        border-radius: 10px;
-        border: 1px solid #ccc;
-        background-color: rgba(255, 255, 255, 0.8);
-        font-size: 1rem;
-        outline: none;
-        transition: 0.3s;
+/* Input Styles */
+.login-box input {
+    width: 100%;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background-color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+}
+
+    .login-box input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
     }
 
-        .login-box input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
-        }
-
-/* Button styling */
+/* Button Styles */
 #login-button {
     background-color: #3674e1;
     border: none;
@@ -114,7 +119,48 @@
     z-index: 10;
 }
 
-/* 📱 Mobile Optimization */
+/* Transparent Navbar */
+.transparent-navbar {
+    display: flex;
+    justify-content: space-between; /* Pushes elements to left and right */
+    align-items: center;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px 20px;
+    background: transparent;
+    z-index: 100;
+}
+
+    /* Left-aligned text */
+    .transparent-navbar p {
+        margin: 0px;
+        font-size: 1.8rem;
+        color: white;
+    }
+
+    /* Right-aligned button */
+    .transparent-navbar button {
+        margin: 0px;
+        font-size: 1.8rem;
+        color: white;
+    }
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+    background-color: transparent;
+    border: 1px solid #fff;
+    padding: 5px 15px;
+    color: white;
+    cursor: pointer;
+}
+
+    .theme-toggle-btn:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+/* Mobile Optimization */
 @media (max-width: 600px) {
     .welcome-box h1 {
         font-size: 1.8rem;

@@ -50,6 +50,10 @@
     margin: 35px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
 }
+.store-content-container-headrow {
+    display: flex;
+    flex-direction: row;
+}
 .main-image-preview {
     border-radius: 15px;
     width: 550px;
@@ -78,10 +82,11 @@
     padding: 10px;
     font-size: 16px;
     margin-top: 0;
+    margin-bottom: 10px;
     cursor: pointer;
     border-radius: 12px;
     width: 100px;
-    margin-right: auto;
+    margin-left: auto;
 }
 .back-button:hover {
     background-color: #c84a40;

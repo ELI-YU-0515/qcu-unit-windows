@@ -6,5 +6,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <div class="store-sidebar">
-	<h1>This is a store page</h1>
+    <h1 class="txt1-headline">QCU Repo</h1>
+
+    <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
 </div>
+
+<div class="store-layout2">
+    <div class="store-content-container">
+         <h1 class="txt1">Sample Application</h1>
+         <img src="Images/placeholder_image.jpg" alt="placeholder" />
+    </div>
+</div>
+
+@code {
+    private void qcuUnitLogin()
+    {
+        Navigation.NavigateTo("/login");
+    }
+}

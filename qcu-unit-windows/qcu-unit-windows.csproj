@@ -77,4 +77,12 @@
       <Folder Include="wwwroot\Icons\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <MauiImage Include="wwwroot\Images\placeholder_image.jpg" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="wwwroot\Images\placeholder_image.jpg" />
+    </ItemGroup>
+
 </Project>

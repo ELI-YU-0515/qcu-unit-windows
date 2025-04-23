@@ -13,8 +13,16 @@
 
 <div class="store-layout2">
     <div class="store-content-container">
-         <h1 class="txt1">Sample Application</h1>
-         <img src="Images/placeholder_image.jpg" alt="placeholder" />
+        <h1 class="txt1">Sample Application</h1>
+        <section class="image-section">
+            <img src="Images/placeholder_image.jpg" class="main-image-preview" alt="placeholder" />
+            <div class="image-section2">
+                <img src="Images/placeholder_image.jpg" class="mini-image-preview" alt="placeholder-mini" />
+                <h1 class="txt1"
+                style="margin-top: 30px;">Application Description</h1>
+                <p class="txt1-p">Description should be here</p>
+            </div>
+        </section>
     </div>
 </div>
 
@@ -22,5 +30,9 @@
     private void qcuUnitLogin()
     {
         Navigation.NavigateTo("/login");
+    }
+    private void qcuUnitBackToHome()
+    {
+        Navigation.NavigateTo("/Home");
     }
 }

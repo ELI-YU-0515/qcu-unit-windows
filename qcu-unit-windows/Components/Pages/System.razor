@@ -1,0 +1,64 @@
+﻿@page "/mysystem"
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using qcu_unit_windows.Components.Layout
+@layout DashboardLayout
+@inject NavigationManager Navigation
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<div class="home-sidebar">
+    <h1 class="txt1-headline">QCU Repo</h1>
+
+    <label class="my-systems-button">
+        Import System
+        <InputFile OnChange="HandleFileSelectedAsync" accept=".zip" style="display:none" />
+    </label>
+
+    <button class="back-button" @onclick="home">Back</button>
+    <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
+</div>
+
+<div class="home-layout2">
+    <section class="search-section">
+        <div class="search-bar">
+            <input type="text" placeholder="Search..." />
+            <button>Search</button>
+        </div>
+    </section>
+
+    <h1 class="txt1 featured-title">My Systems</h1>
+
+    <div class="no-scrollbar featured-grid">
+        @foreach (var zipFile in importedZips)
+        {
+            <div class="home-content-container">
+                <p>@zipFile</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<string> importedZips = new();
+
+    private async Task HandleFileSelectedAsync(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null && file.Name.EndsWith(".zip"))
+        {
+            importedZips.Add(file.Name);
+            await InvokeAsync(StateHasChanged); // refresh UI after adding
+        }
+    }
+
+    private void qcuUnitLogin()
+    {
+        Navigation.NavigateTo("/login");
+    }
+
+    private void home()
+    {
+        Navigation.NavigateTo("/home");
+    }
+}

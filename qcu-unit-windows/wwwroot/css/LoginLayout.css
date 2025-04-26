@@ -2,7 +2,7 @@
 
 .login-layout {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(to right, #3674e1, #a1c4fd);
+    background: #3674e1;
     scroll-behavior: smooth;
     margin: 0;
     padding: 0;
@@ -17,6 +17,7 @@
     align-items: center;
     text-align: center;
     padding: 0 20px;
+    background-color: #1f4488;
 }
 
     .welcome-box h1 {
@@ -138,6 +139,7 @@
         margin: 0px;
         font-size: 1.8rem;
         color: white;
+        -webkit-text-stroke: .01px black;
     }
 
     /* Right-aligned button */

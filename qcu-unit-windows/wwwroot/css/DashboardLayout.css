@@ -30,6 +30,31 @@
     gap: 20px;
 }
 
+    .home-sidebar h1 {
+        text-align: center;
+    }
+
+    .home-sidebar button {
+        background-color: #3674e1;
+        padding: 8px 15px;
+        margin-right: 6px;
+        margin-top: 200px;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+.home-sidebar label {
+    background-color: #3674e1;
+    padding: 8px 15px;
+    margin-right: 6px;
+    margin-top: 200px;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
 .home-content-container {
     display: flex;
     flex-direction: column;
@@ -170,6 +195,10 @@
     font-size: 25px;
     color: white;
     font-weight: 600;
+}
+
+.back-button {
+    background-color: #3674e1;
 }
 
 /* Media Query for Mobile and Smaller Devices */

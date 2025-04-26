@@ -7,6 +7,7 @@
 
 <div class="home-sidebar">
     <h1 class="txt1-headline">QCU Repo</h1>
+    <button class="my-systems-button" @onclick="MySystems">My Systems</button>
     <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
 </div>
 
@@ -41,5 +42,9 @@
     private void qcuUnitStore()
     {
         Navigation.NavigateTo("/Store");
+    }
+    private void MySystems()
+    {
+        Navigation.NavigateTo("/mysystem");
     }
 }

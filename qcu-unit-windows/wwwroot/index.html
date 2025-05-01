@@ -45,6 +45,18 @@
         }
     </script>
 
+    <script>
+        window.scrollToBottom = (elementId, dotNetHelper) => {
+            var element = document.getElementById(elementId);
+            if (element) {
+                element.onscroll = () => {
+                    if (element.scrollTop + element.clientHeight >= element.scrollHeight) {
+                        dotNetHelper.invokeMethodAsync('LoadMoreItems');
+                    }
+                };
+            }
+        };
+    </script>
 
 </body>
 

@@ -5,46 +5,90 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<div class="home-sidebar">
-    <h1 class="txt1-headline">QCU Repo</h1>
-    <button class="my-systems-button" @onclick="MySystems">My Systems</button>
-    <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
-</div>
+<!-- Toggle button always visible on top -->
+<button class="toggle-sidebar-button @sidebarButtonClass" @onclick="ToggleSidebar">
+    &#8594; 
+</button>
 
-<div class="home-layout2">
-    <section class="search-section">
-        <div class="search-bar">
-            <input type="text" placeholder="Search..." />
-            <button>Search</button>
+<div class="home-layout">
+    <div class="home-sidebar @sidebarClass">
+        <h1 class="txt1-headline">QCU Repo</h1>
+        <button class="my-systems-button" @onclick="MySystems">My Systems</button>
+        <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
+    </div>
+
+    <div class="home-layout2">
+        <div class="search-section-wrapper">
+            <section class="search-section">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search..." />
+                    <button>Search</button>
+                </div>
+            </section>
         </div>
-    </section>
-    <h1 class="txt1 featured-title">Featured</h1>
-    <div class="no-scrollbar featured-grid">
-        <div class="home-content-container">
-            <p>Application 1</p>
-            <input class="nav-button" type="button" value="View" @onclick="qcuUnitStore" />
+
+        <h1 class="txt1 featured-title">Featured</h1>
+
+        <div class="featured-container">
+            <!-- Left arrow -->
+            <button class="nav-button nav-left" @onclick="PreviousItem">◀</button>
+
+            <!-- Show one item at a time -->
+            <div class="featured-grid single-item">
+                @if (items.Count > 0)
+                {
+                    <div class="home-content-container" style="transform: translateX(-@currentItemIndex * 100%);">
+                        <p>@items[currentItemIndex]</p>
+                        <input class="nav-button" type="button" value="View" @onclick="qcuUnitStore" />
+                    </div>
+                }
+            </div>
+
+            <!-- Right arrow -->
+            <button class="nav-button nav-right" @onclick="NextItem">▶</button>
         </div>
-        <div class="home-content-container">
-            <p>Application 2</p>
+
+        <!-- Add a row of 7 squares below -->
+        <div class="square-row">
+            @for (int i = 0; i < items.Count; i++)
+            {
+                <div class="square @(i == currentItemIndex ? "active" : "")"></div>
+            }
         </div>
-        <div class="home-content-container">
-            <p>Application 3</p>
-        </div>
+
     </div>
 </div>
 
 @code {
-    private void qcuUnitLogin()
+    private string sidebarClass = "closed";
+    private string sidebarButtonClass = "";
+
+    private int currentItemIndex = 0;
+
+    private List<string> items = new()
     {
-        Navigation.NavigateTo("/login");
+        "Application 1", "Application 2", "Application 3", "Application 4", "Application 5", "Application 6", "Application 7"
+    };
+
+    private void ToggleSidebar()
+    {
+        sidebarClass = sidebarClass == "closed" ? "open" : "closed";
+        sidebarButtonClass = sidebarClass == "open" ? "open" : "";
     }
 
-    private void qcuUnitStore()
+    private void qcuUnitLogin() => Navigation.NavigateTo("/login");
+    private void qcuUnitStore() => Navigation.NavigateTo("/Store");
+    private void MySystems() => Navigation.NavigateTo("/mysystem");
+
+    private void PreviousItem()
     {
-        Navigation.NavigateTo("/Store");
+        if (currentItemIndex > 0)
+            currentItemIndex--;
     }
-    private void MySystems()
+
+    private void NextItem()
     {
-        Navigation.NavigateTo("/mysystem");
+        if (currentItemIndex < items.Count - 1)
+            currentItemIndex++;
     }
 }

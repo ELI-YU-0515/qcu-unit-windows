@@ -57,6 +57,14 @@
             }
         };
     </script>
+    
+    <script>
+        window.registerScrollListener = (dotNetHelper) => {
+            window.addEventListener('scroll', () => {
+                dotNetHelper.invokeMethodAsync('OnScrollChanged', window.scrollY);
+            });
+        };
+    </script>
 
 </body>
 

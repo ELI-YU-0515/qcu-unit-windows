@@ -2,6 +2,7 @@
 @using qcu_unit_windows.Components.Layout
 @layout DashboardLayout
 @inject NavigationManager Navigation
+@implements IDisposable
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -18,8 +19,8 @@
     </div>
 
     <div class="home-layout2">
-        <div class="search-section-wrapper">
-            <section class="search-section">
+        <div class="search-section-wrapper" id="searchWrapper">
+            <section class="search-section @(isScrolled ? "expanded" : "")">
                 <div class="search-bar">
                     <input type="text" placeholder="Search..." />
                     <button>Search</button>
@@ -29,23 +30,26 @@
 
         <h1 class="txt1 featured-title">Featured</h1>
 
-        <div class="featured-container">
+        <div class="featured-container clickable-feature" @onclick="qcuUnitStore">
             <!-- Left arrow -->
-            <button class="nav-button nav-left" @onclick="PreviousItem">◀</button>
+            <button class="nav-button nav-left" @onclick:stopPropagation="true" @onclick="PreviousItem">◀</button>
 
             <!-- Show one item at a time -->
             <div class="featured-grid single-item">
                 @if (items.Count > 0)
                 {
                     <div class="home-content-container" style="transform: translateX(-@currentItemIndex * 100%);">
-                        <p>@items[currentItemIndex]</p>
-                        <input class="nav-button" type="button" value="View" @onclick="qcuUnitStore" />
+                        <div class="item-content clickable-item" @onclick="qcuUnitStore">
+                            <p class="item-title">@items[currentItemIndex]</p>
+                        </div>
+
                     </div>
+
                 }
             </div>
 
             <!-- Right arrow -->
-            <button class="nav-button nav-right" @onclick="NextItem">▶</button>
+            <button class="nav-button nav-right" @onclick:stopPropagation="true" @onclick="NextItem">▶</button>
         </div>
 
         <!-- Add a row of 7 squares below -->
@@ -57,11 +61,49 @@
         </div>
 
     </div>
+
+</div>
+<div class="explore-banner">
+    <div class="explore-divider"></div>
+    <h1 class="explore-title">Explore</h1>
+    <div class="explore-divider"></div>
 </div>
 
+<div class="general-grid">
+    @for (int i = 1; i <= 20; i++) // 4x5 = 20 items
+    {
+        <div class="general-box" @onclick="() => OnGeneralItemClick(i)">
+            <p>Item @i</p>
+        </div>
+    }
+</div>
+@inject IJSRuntime JS
 @code {
     private string sidebarClass = "closed";
     private string sidebarButtonClass = "";
+    private bool isScrolled = false;
+    private DotNetObjectReference<Home>? _dotNetRef;
+
+    [JSInvokable]
+    public void OnScrollChanged(double scrollTop)
+    {
+        isScrolled = scrollTop > 100;
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("registerScrollListener", _dotNetRef);
+        }
+    }
+
+    public void Dispose()
+    {
+        _dotNetRef?.Dispose();
+    }
 
     private int currentItemIndex = 0;
 
@@ -82,13 +124,16 @@
 
     private void PreviousItem()
     {
-        if (currentItemIndex > 0)
-            currentItemIndex--;
+        currentItemIndex = (currentItemIndex - 1 + items.Count) % items.Count;
     }
 
     private void NextItem()
     {
-        if (currentItemIndex < items.Count - 1)
-            currentItemIndex++;
+        currentItemIndex = (currentItemIndex + 1) % items.Count;
     }
+    private void OnGeneralItemClick(int itemNumber)
+    {
+        Console.WriteLine($"Clicked on: Item {itemNumber}");
+        // Future logic goes here
+    }           
 }

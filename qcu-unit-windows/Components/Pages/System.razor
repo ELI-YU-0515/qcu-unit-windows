@@ -27,7 +27,40 @@
         </div>
     </section>
 
-    <h1 class="txt1 featured-title">My Systems</h1>
+
+
+
+    <div class="title-box">
+        <h1 class="txt1 featured-title2">My Systems</h1>
+        <div class="button-group2">
+            <input class="back-button" type="button" value="Back" @onclick="home" />
+            <input class="back-button" type="button" value="Upload" @onclick="OpenPopup" />
+        </div>
+    </div>
+
+
+
+
+    <div class="mysystem-recent">
+        <h1 class="txt1 featured-title3">Recently Opened</h1>
+    </div>
+
+
+
+    <div class="mysystem-installed">
+        <h1 class="txt1 featured-title3">Uploaded Systems</h1>
+
+        <div class="general-grid">
+            @for (int i = 1; i <= 20; i++) // 4x5 = 20 items
+            {
+                <div class="general-box" @onclick="() => OnGeneralItemClick(i)">
+                    <p>Item @i</p>
+                </div>
+            }
+        </div>
+
+    </div>
+
 
     <div class="no-scrollbar featured-grid">
         @foreach (var zipFile in importedZips)
@@ -38,6 +71,20 @@
         }
     </div>
 </div>
+
+
+@if (showPopup)
+{
+    <div class="popup-overlay">
+        <div class="popup-modal">
+            <h2>Upload</h2>
+            <button class="return-button" @onclick="ClosePopup">Return</button>
+        </div>
+    </div>
+}
+
+
+
 
 @code {
     private List<string> importedZips = new();
@@ -61,4 +108,33 @@
     {
         Navigation.NavigateTo("/home");
     }
+    private void upload()
+    {
+        Navigation.NavigateTo("/home");
+    }
+
+
+
+
+    private void OnGeneralItemClick(int itemNumber)
+    {
+        Console.WriteLine($"Clicked on: Item {itemNumber}");
+        // Future logic goes here
+    }
+
+
+
+    private bool showPopup = false;
+
+    private void OpenPopup()
+    {
+        showPopup = true;
+    }
+
+    private void ClosePopup()
+    {
+        showPopup = false;
+    }
+
+
 }

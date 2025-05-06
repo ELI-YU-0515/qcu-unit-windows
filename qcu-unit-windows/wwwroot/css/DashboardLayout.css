@@ -7,9 +7,115 @@ html, body {
 }
 
 
+
+/*MEDIA QUERY FOR DESKTOP*/
+@media (min-width: 769px) {
+    .mobile-nav {
+        display: none !important;
+    }
+    .reels-wrapper {
+        display: none;
+    }
+}
+
 /* Adjustments for mobile */
 @media (max-width: 768px) {
+    .toggle-sidebar-button {
+        display: none;
+    }
+    .search-section {
+        display: none !important;
+    }
+    .general-grid {
+        display: none !important;
+    }
+
+
+    .mobile-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        background: rgba(255, 255, 255);
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        z-index: 100;
+    }
+
+        .mobile-nav button {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #1448a3;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 10px 0;
+            transition: color 0.2s ease;
+        }
+
+            .mobile-nav button:hover {
+                color: #3674e1;
+            }
+
+            .mobile-nav button.active {
+                color: #87a8fa;
+            }
+
+
+
+    .reels-wrapper {
+        overflow-x: auto;
+        padding: 10px 0;
+        -webkit-overflow-scrolling: touch;
+        margin: 15px;
+    }
+
+    .reels-scroll-container {
+        display: flex;
+        gap: 10px;
+        scroll-snap-type: x mandatory;
+        scroll-padding-left: 20px; /* tell scroll-snap to start aligning from here */
+        overflow-x: auto;
+        padding: 10px;
+        margin: 100px 0;
+        z-index: 10;
+        position: relative;
+        border-top: 3px solid rgba(0, 0, 0, 0.4);
+        border-bottom: 3px double rgba(0, 0, 0, 0.4);
+    }
+
+
+        .reels-scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+    .reels-item {
+        flex: 0 0 auto;
+        width: 90px;
+        height: 150px;
+        background-color: rgba(242, 242, 242, 0.6); /* 0.6 = 60% opacity */
+        border-radius: 10px;
+        scroll-snap-align: start;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin: 0 1px 0 1px;
+        transition: transform 0.3s ease;
+    }
+    .featured-title {
+        margin-top:50px;
+    }
+
+
 }
+
 
  
 .home-layout {
@@ -28,7 +134,7 @@ html, body {
     flex-direction: column;
     flex-grow: 1;
     align-items: center;
-    padding:10% 10px 10px 10px;
+    padding:8% 10px 10px 10px;
     transition: all 0.3s ease;
     width: 100%;
     min-height: 100vh;
@@ -88,6 +194,7 @@ html, body {
     border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    z-index:1002;
 }
     .home-sidebar .my-systems-button:hover {
         background-color: #4383f3;
@@ -119,7 +226,6 @@ html, body {
 
 .search-section {
     top: 0;
-    margin-bottom:100px;
     position: fixed;
     width: 900px;
     padding: 15px 20px;

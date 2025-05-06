@@ -11,6 +11,12 @@
     &#8594; 
 </button>
 
+<div class="mobile-nav">
+    <button class="nav-home">Home</button>
+    <button class="nav-search">Search</button>
+    <button class="nav-profile">Profile</button>
+    <button class="nav-settings" @onclick="ToggleSidebar">Settings</button>
+</div>
 <div class="home-layout">
     <div class="home-sidebar @sidebarClass">
         <h1 class="txt1-headline">QCU Repo</h1>
@@ -19,14 +25,13 @@
     </div>
 
     <div class="home-layout2">
-        <div class="search-section-wrapper" id="searchWrapper">
             <section class="search-section @(isScrolled ? "expanded" : "")">
                 <div class="search-bar">
                     <input type="text" placeholder="Search..." />
                     <button>Search</button>
                 </div>
             </section>
-        </div>
+        
 
         <h1 class="txt1 featured-title">Featured</h1>
 
@@ -59,7 +64,6 @@
                 <div class="square @(i == currentItemIndex ? "active" : "")"></div>
             }
         </div>
-
     </div>
 
 </div>
@@ -67,6 +71,33 @@
     <div class="explore-divider"></div>
     <h1 class="explore-title">Explore</h1>
     <div class="explore-divider"></div>
+</div>
+    <!-- FB Reels Style Slideshow - Mobile Only -->
+    <div class="reels-wrapper">
+    <div class="reels-scroll-container">
+        @foreach (var system in systems)
+        {
+            <div class="reels-item" @onclick="() => OnSystemClick(system)">
+                <p>@system</p>
+            </div>
+        }
+    </div>
+        <div class="reels-scroll-container">
+        @foreach (var system in systems)
+        {
+            <div class="reels-item" @onclick="() => OnSystemClick(system)">
+                <p>@system</p>
+            </div>
+        }
+    </div>
+    <div class="reels-scroll-container">
+        @foreach (var system in systems)
+        {
+            <div class="reels-item" @onclick="() => OnSystemClick(system)">
+                <p>@system</p>
+            </div>
+        }
+    </div>
 </div>
 
 <div class="general-grid">
@@ -77,6 +108,11 @@
         </div>
     }
 </div>
+
+<!-- MOBILE NAVBAR -->
+
+
+
 @inject IJSRuntime JS
 @code {
     private string sidebarClass = "closed";
@@ -99,34 +135,27 @@
             await JS.InvokeVoidAsync("registerScrollListener", _dotNetRef);
         }
     }
-
     public void Dispose()
     {
         _dotNetRef?.Dispose();
     }
-
     private int currentItemIndex = 0;
-
     private List<string> items = new()
     {
         "Application 1", "Application 2", "Application 3", "Application 4", "Application 5", "Application 6", "Application 7"
     };
-
     private void ToggleSidebar()
     {
         sidebarClass = sidebarClass == "closed" ? "open" : "closed";
         sidebarButtonClass = sidebarClass == "open" ? "open" : "";
     }
-
     private void qcuUnitLogin() => Navigation.NavigateTo("/login");
     private void qcuUnitStore() => Navigation.NavigateTo("/Store");
     private void MySystems() => Navigation.NavigateTo("/mysystem");
-
     private void PreviousItem()
     {
         currentItemIndex = (currentItemIndex - 1 + items.Count) % items.Count;
     }
-
     private void NextItem()
     {
         currentItemIndex = (currentItemIndex + 1) % items.Count;
@@ -136,4 +165,21 @@
         Console.WriteLine($"Clicked on: Item {itemNumber}");
         // Future logic goes here
     }           
+
+    private List<string> systems = new()
+    {
+        "System A", "System B", "System C", "System D", "System E",
+        "System F", "System G", "System H", "System I", "System J"
+    };
+
+    private void OnSystemClick(string systemName)
+    {
+        // Handle click (redirect, open modal, etc.)
+        Console.WriteLine($"Clicked: {systemName}");
+    }
+
+
 }
+
+
+

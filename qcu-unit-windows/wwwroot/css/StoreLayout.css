@@ -3,17 +3,17 @@
     color: white;
     font-weight: 600;
 }
-.tx1 {
+.txt1 {
     font-size: 20px;
 }
-.tx1-p {
-    font-size: 14px;
+.txt1-p {
+    font-size: 19px;
 }
 .store-layout {
     display: flex;
     flex-direction: row;
     height: 100vh;
-    background: linear-gradient(to right, #3674e1, #a1c4fd);
+    background: linear-gradient(to right, #062454, #1448A3);
     font-family: 'Poppins';
     margin: 0;
 }
@@ -100,6 +100,7 @@
 .image-section2 {
     display: flex;
     flex-direction: column;
+    width: 350px;
 }
 .back-button {
     background-color: #b83930;

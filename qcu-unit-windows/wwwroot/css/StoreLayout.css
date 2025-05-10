@@ -180,6 +180,21 @@
     .back-button:hover {
         background-color: #c9302c; /* deeper red on hover */
     }
+.upload-button {
+    background-color: #3c8dbc; /* consistent blue */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    margin-left: 8px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .upload-button:hover {
+        background-color: #295b8f; /* deeper blue on hover */
+    }
 
 /*POPUP MODULE*/
 .popup-overlay {
@@ -207,6 +222,9 @@
     max-height: 80vh;
     overflow-y: auto;
 }
+    .popup-modal p {
+        margin-top: 16px;
+    }
 .return-button {
     background-color: #d9534f;
     color: white;
@@ -220,4 +238,32 @@
     .return-button:hover {
         background-color: #c9302c;
     }
+.upload-zip-button {
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 16px;
+    margin-right: 350px;
+    transition: background-color 0.3s;
+}
 
+    .upload-zip-button:hover {
+        background-color: #449d44;
+    }
+
+.upload-container {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 16px;
+    padding: 15px 23px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    min-height: 400px;
+    max-width: 800px;
+    max-height: 70vh;
+    overflow-y: auto;
+    margin-top: 16px;
+}

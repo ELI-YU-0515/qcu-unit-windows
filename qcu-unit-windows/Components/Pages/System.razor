@@ -34,7 +34,7 @@
         <h1 class="txt1 featured-title2">My Systems</h1>
         <div class="button-group2">
             <input class="back-button" type="button" value="Back" @onclick="home" />
-            <input class="back-button" type="button" value="Upload" @onclick="OpenPopup" />
+            <input class="upload-button" type="button" value="Upload" @onclick="OpenPopup" />
         </div>
     </div>
 
@@ -78,7 +78,15 @@
     <div class="popup-overlay">
         <div class="popup-modal">
             <h2>Upload</h2>
+            <label class="upload-zip-button">
+                Upload Zip File
+                <InputFile OnChange="HandleFileSelectedAsync" accept=".zip" style="display:none" />
+            </label>
             <button class="return-button" @onclick="ClosePopup">Return</button>
+            <div class="upload-container">
+
+            </div>
+            <p>Kindly upload your system in ZIP format.</p>
         </div>
     </div>
 }

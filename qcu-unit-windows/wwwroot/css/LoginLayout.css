@@ -1,112 +1,125 @@
 ﻿@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-.login-layout {
-    font-family: 'Poppins', sans-serif;
-    background: #3674e1;
-    scroll-behavior: smooth;
-    margin: 0;
-    padding: 0;
+
+.horizontal-box {
+    display:flex;
+    flex-direction:row;
 }
 
-/* Welcome Section */
-.welcome-box {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 0 20px;
-    background-color: #1f4488;
-}
 
-    .welcome-box h1 {
-        font-size: 2.5rem;
-        color: white;
-        margin-bottom: 1rem;
+    .login-layout {
+        font-family: 'Poppins', sans-serif;
+        background: #3674e1;
+        scroll-behavior: smooth;
+        margin: 0;
+        padding: 0;
     }
 
-    .welcome-box p {
-        font-size: 1.1rem;
-        color: white;
-        max-width: 90%;
-        margin: 0.25rem 0;
+
+
+    /* Welcome Section */
+    .welcome-box {
+        width:65%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 0 20px;
+        background-color: #1f4488;
     }
 
-/* Login Box */
-.login-box {
-    padding: 2rem;
-    width: 400px;
-    max-width: 90%;
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    background: rgba(255, 255, 255, 0.4);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-}
+        .welcome-box h1 {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
 
-/* Invisible Block for Centering Login Box */
-.invis-block {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
+        .welcome-box p {
+            font-size: 1.1rem;
+            color: white;
+            max-width: 90%;
+            margin: 0.25rem 0;
+        }
 
-/* Input Styles */
-.login-box input {
-    width: 100%;
-    padding: 0.75rem;
-    margin: 0.5rem 0;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    background-color: rgba(255, 255, 255, 0.8);
-    font-size: 1rem;
-    outline: none;
-    transition: 0.3s;
-}
-
-    .login-box input:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+    /* Login Box */
+    .login-box {
+        padding: 4rem;
+        width:35%;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.4);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content:center;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     }
 
-/* Button Styles */
-#login-button {
-    background-color: #3674e1;
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    font-size: 16px;
-    margin: 10px 0;
-    cursor: pointer;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-}
+        .password-instructions p {
+            margin:10px 0 10px 0;
+        }
 
-    #login-button:hover {
-        background-color: #4383f3;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    /* Invisible Block for Centering Login Box */
+    .invis-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
     }
 
-    #login-button:focus {
+    /* Input Styles */
+    .login-box input {
+        width: 100%;
+        padding: 0.75rem;
+        margin: 0.5rem 0;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        background-color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
         outline: none;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+        transition: 0.3s;
     }
 
-    #login-button:active {
-        transform: scale(0.98);
-        background-color: #2d60b9;
+        .login-box input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+        }
+
+    /* Button Styles */
+    #login-button {
+        background-color: #3674e1;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        font-size: 16px;
+        margin: 10px 0;
+        cursor: pointer;
+        border-radius: 12px;
+        transition: all 0.3s ease;
     }
 
-/* Optional Tooltip */
+        #login-button:hover {
+            background-color: #4383f3;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #login-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+        }
+
+        #login-button:active {
+            transform: scale(0.98);
+            background-color: #2d60b9;
+        }
+
+    /* Optional Tooltip */
 .password-instructions {
-    display: none;
+    display: flex;
     position: absolute;
-    top: 50px;
+    top:40%;
     left: 50%;
     transform: translateX(-50%);
     background-color: rgba(0, 0, 0, .65);
@@ -118,49 +131,89 @@
     text-align: center;
     font-size: 14px;
     z-index: 10;
+    justify-content: center;
+    align-content: center;
 }
 
-/* Transparent Navbar */
-.transparent-navbar {
-    display: flex;
-    justify-content: space-between; /* Pushes elements to left and right */
-    align-items: center;
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    padding: 10px 20px;
-    background: transparent;
-    z-index: 100;
-}
+    /* Transparent Navbar */
+    .transparent-navbar {
+        display: flex;
+        justify-content: space-between; /* Pushes elements to left and right */
+        align-items: center;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 10px 20px;
+        background: transparent;
+        z-index: 100;
+    }
 
-    /* Left-aligned text */
-    .transparent-navbar p {
-        margin: 0px;
-        font-size: 1.8rem;
+        /* Left-aligned text */
+        .transparent-navbar p {
+            margin: 0px;
+            font-size: 1.8rem;
+            color: white;
+            -webkit-text-stroke: .01px black;
+        }
+
+        /* Right-aligned button */
+        .transparent-navbar button {
+            margin: 0px;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+    /* Theme Toggle Button */
+    .theme-toggle-btn {
+        background-color: transparent;
+        border: 1px solid #fff;
+        padding: 5px 15px;
         color: white;
-        -webkit-text-stroke: .01px black;
+        cursor: pointer;
     }
 
-    /* Right-aligned button */
-    .transparent-navbar button {
-        margin: 0px;
-        font-size: 1.8rem;
-        color: white;
-    }
+        .theme-toggle-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
 
-/* Theme Toggle Button */
-.theme-toggle-btn {
-    background-color: transparent;
-    border: 1px solid #fff;
-    padding: 5px 15px;
-    color: white;
-    cursor: pointer;
+
+
+/*VERY COMPLICATED - LOGIN MODULE PROMPTS*/
+        
+.prompt-1 {
+    text-align:center;
+    justify-content:center;
 }
 
-    .theme-toggle-btn:hover {
-        background-color: rgba(255, 255, 255, 0.2);
+.prompt-2 p{
+    margin:20px 0 30px 0;
+}
+.submit {
+    margin: 30px 0 30px 0;
+}
+.url-code, .url-otp {
+    margin-bottom:30px;
+}
+
+.prompt-3 p{
+    margin: 10px 0 50px 0;
+}
+
+.Create-Pass {
+    margin: 0px 0 30px 0;
+}
+.svg-button {
+    transition: transform 0.3s ease, cursor 0.3s ease;
+}
+
+    .svg-button:hover {
+        transform: scale(1.2); /* Slight scaling on hover */
+        cursor: pointer; /* Change cursor to pointer */
     }
+
+
+
 
 /* Mobile Optimization */
 @media (max-width: 600px) {
@@ -181,4 +234,13 @@
         font-size: 14px;
         padding: 12px 24px;
     }
+
+    .horizontal-box {
+        display: flex;
+        flex-direction: column;
+    }
+
+
 }
+
+

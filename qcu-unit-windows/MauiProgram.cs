@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Firebase.Auth.Providers;
+using Firebase.Auth;
+using Microsoft.Extensions.Logging;
 
 namespace qcu_unit_windows
 {
@@ -11,15 +13,29 @@ namespace qcu_unit_windows
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
                 {
-                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
-    		builder.Logging.AddDebug();
+            builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Logging.AddDebug();
 #endif
+
+            // Register FirebaseAuthClient
+            builder.Services.AddSingleton(new FirebaseAuthClient(new FirebaseAuthConfig()
+            {
+                ApiKey = "AIzaSyDFhJ1SBO3M2AFstZyz50fwXdx57POB3N0",
+                AuthDomain = "qcu-repo-dbf94.firebaseapp.com",
+                Providers = new FirebaseAuthProvider[]
+                {
+                    new EmailProvider()
+                }
+            }));
+
+            // ✅ Register your custom FirebaseAuthService
+            builder.Services.AddSingleton<FirebaseAuthService>();
 
             return builder.Build();
         }

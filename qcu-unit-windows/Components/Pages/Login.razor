@@ -4,22 +4,93 @@
 @layout LoginLayout
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
+@inject FirebaseAuthService firebaseAuthService
 
-<h1 style="text-align:center; margin-bottom:30px;">LOGIN</h1>
-<p style ="margin-bottom:20px;">Welcome to QCU-REPO</p>
-<input id="login-id" placeholder="Student ID ex. 20-0000" type="text" />
-<input id="login-password" placeholder="Password" type="password" @onfocus="ShowPasswordInstructions" @onblur="HidePasswordInstructions" />
+<div class="loginn-layout">
+    <div class="horizontal-box">
+        <!-- Welcome Section -->
+        <div class="welcome-box">
+            <h1>Welcome to QCU Repository</h1>
+            <br /><br /><br />
+            <p>This platform allows you to access, store, and manage QCU resources easily.</p><br /><br />
+            <p>Please log in to continue.</p>
+        </div>
 
-<!-- Floating Instructions Box -->
-<div id="password-instructions" class="password-instructions" style="display:none;">
-    <p>Password format should be like this:</p>
-    <p><strong>QCU-STUDENTID-surname</strong></p>
-    <p><strong>Example: QCU-201234-guzman</strong></p>
+        <!-- Login Section -->
+        <div class="login-box">
+
+            <!-- Step 1: Login -->
+            <div class="prompt-1" style="@(!showPrompt1 ? "display:none;" : "")">
+                <h1 style="text-align:center; margin-bottom:30px;">LOGIN</h1>
+                <p style="margin-bottom:60px;">Welcome to QCU-REPO</p>
+
+                <input id="login-email" placeholder="Email" type="email" @bind="email" />
+                <input id="login-password" placeholder="Password" type="password" @bind="password"
+                       @onfocus="ShowPasswordInstructions" @onblur="HidePasswordInstructions" />
+                <input id="login-button" type="button" value="LOGIN" @onclick="HandleLogin" />
+
+                <div id="password-instructions" class="password-instructions" style="display:none;">
+                    <p>Password format should be like this:</p>
+                    <p><strong>QCU-STUDENTID-surname</strong></p>
+                    <p><strong>Example: QCU-201234-guzman</strong></p>
+                </div>
+            </div>
+
+            <!-- Step 2: Verification (First time login) -->
+            <div class="prompt-2" style="@(!showPrompt2 ? "display:none;" : "")">
+                <!-- SVG Return Button -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @onclick="ReturnToPrompt1" class="svg-button">
+                    <path d="M19 12H5"></path>
+                    <path d="M12 5l-7 7 7 7"></path>
+                </svg>
+                <br /><br /><br />
+
+                <h2>First Time Logging In?</h2>
+                <p>For account authentication, we sent a 6-digit code to your email or using your working mobile number for OTP Authentication.</p>
+
+                <input id="temp-code" placeholder="Enter 6-Digit Code" type="number" />
+                <input id="OTP-code" placeholder="Please Enter working Mobile Number" type="number" style="display:none;" />
+                <input id="OTP-code2" placeholder="Enter OTP Code sent via Mobile Number" type="number" style="display:none;" />
+
+                <a class="url-otp" style="cursor:pointer; width:auto; margin-bottom:30px" @onclick="@(async () => await JSRuntime.InvokeVoidAsync("swapToOTP"))">
+                    or Use Mobile Number for OTP
+                </a>
+                <a class="url-code" style="display:none; cursor:pointer; width:auto; margin-bottom:30px;" @onclick="@(async () => await JSRuntime.InvokeVoidAsync("swapToEmail"))">
+                    or Use Email 6-Digit Code
+                </a>
+
+                <input id="Submit" type="button" value="Submit" @onclick="HandleVerificationSubmit" />
+            </div>
+
+            <!-- Step 3: Create Password -->
+            <div class="prompt-3" style="@(!showPrompt3 ? "display:none;" : "")">
+                <!-- SVG Return Button -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @onclick="ReturnToPrompt2" class="svg-button">
+                    <path d="M19 12H5"></path>
+                    <path d="M12 5l-7 7 7 7"></path>
+                </svg>
+                <br /><br /><br />
+                <h2>Change Password</h2>
+                <p>For security purposes, please create a new password for QCUREPO</p>
+                <input id="new-pass-1" placeholder="Create Password" type="password" />
+                <input id="new-pass-2" placeholder="Re-Enter Password" type="password" />
+                <p>Password must include CAPITALIZED LETTERS, special symbols, and Numbers</p>
+
+                <input id="Create-Pass" style="margin: 30px 0;" type="button" value="Create Password" @onclick="HandleCreatePassword" />
+            </div>
+
+        </div>
+    </div>
 </div>
 
-<input id="login-button" type="button" value="LOGIN" @onclick="qcuUnitDashboard" />
-
 @code {
+    private string email = string.Empty;
+    private string password = string.Empty;
+
+    private bool showPrompt1 = true;
+    private bool showPrompt2 = false;
+    private bool showPrompt3 = false;
+
     private async Task ShowPasswordInstructions()
     {
         await JSRuntime.InvokeVoidAsync("showPasswordInstructions");
@@ -30,8 +101,84 @@
         await JSRuntime.InvokeVoidAsync("hidePasswordInstructions");
     }
 
-    private void qcuUnitDashboard()
+    private async Task HandleLogin()
     {
-        Navigation.NavigateTo("/home");
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Please fill in both fields.");
+            return;
+        }
+
+        try
+        {
+            var token = await firebaseAuthService.LoginUser(email, password);
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                showPrompt1 = false;
+                showPrompt2 = true;
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Invalid login credentials.");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Login failed: {ex.Message}");
+        }
+    }
+
+    private void HandleVerificationSubmit()
+    {
+        showPrompt2 = false;
+        showPrompt3 = true;
+    }
+
+    private void HandleCreatePassword()
+    {
+        // Assuming this would take the user to the home page after setting their password
+        Navigation.NavigateTo("/home"); // Ensure that /home exists as a valid route
+    }
+
+    private void ReturnToPrompt1()
+    {
+        showPrompt1 = true;
+        showPrompt2 = false;
+    }
+
+    private void ReturnToPrompt2()
+    {
+        showPrompt2 = true;
+        showPrompt3 = false;
     }
 }
+
+
+<script>
+    window.swapToOTP = () => {
+        document.getElementById("temp-code").style.display = "none";
+        document.getElementById("OTP-code").style.display = "block";
+        document.getElementById("OTP-code2").style.display = "block";
+
+        document.querySelector(".url-otp").style.display = "none";
+        document.querySelector(".url-code").style.display = "block";
+    };
+
+    window.swapToEmail = () => {
+        document.getElementById("temp-code").style.display = "block";
+        document.getElementById("OTP-code").style.display = "none";
+        document.getElementById("OTP-code2").style.display = "none";
+
+        document.querySelector(".url-otp").style.display = "block";
+        document.querySelector(".url-code").style.display = "none";
+    };
+
+    window.showPasswordInstructions = () => {
+        document.getElementById("password-instructions").style.display = "block";
+    };
+
+    window.hidePasswordInstructions = () => {
+        document.getElementById("password-instructions").style.display = "none";
+    };
+</script>

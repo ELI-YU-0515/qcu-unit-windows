@@ -12,12 +12,15 @@
 </button>
 
 <div class="mobile-nav">
+    <div class="sidebar-overlay @(sidebarClass == "open" ? "visible" : "")" @onclick="ToggleSidebar"></div>
     <button class="nav-home">Home</button>
     <button class="nav-search">Search</button>
     <button class="nav-profile">Profile</button>
     <button class="nav-settings" @onclick="ToggleSidebar">Settings</button>
 </div>
-<div class="home-layout">
+
+<div class="home-layout">         
+    <div class="sidebar-overlay @(sidebarClass == "open" ? "visible" : "")" @onclick="ToggleSidebar"></div>
     <div class="home-sidebar @sidebarClass">
         <h1 class="txt1-headline">QCU Repo</h1>
         <button class="my-systems-button" @onclick="MySystems">My Systems</button>

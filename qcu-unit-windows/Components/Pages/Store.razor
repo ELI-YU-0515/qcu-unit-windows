@@ -5,7 +5,12 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<div class="store-sidebar">
+<button class="toggle-store-sidebar-button @StoreSideBarButtonClass" @onclick="ToggleStoreSidebar">
+    &#8594;
+</button>
+
+
+<div class="store-sidebar @StoreSideBarClass">
     <h1 class="txt1-headline">QCU Repo</h1>
 
     <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
@@ -13,24 +18,31 @@
 
 <div class="store-layout2">
     <div class="store-content-container">
-        <div class="store-content-container-headrow">
-            <h1 class="txt1">Application 1</h1>
-            <input class="back-button" type="button" value="Back" @onclick="qcuUnitBackToHome"/>
-        </div>
-        
+        @*      <input class="back-button" type="button" value="Back" @onclick="qcuUnitBackToHome"/>  *@
+        @*  </div> *@
         <section class="image-section">
             <img src="Images/placeholder_image.jpg" class="main-image-preview" alt="placeholder" />
             <div class="image-section2">
-                <img src="Images/placeholder_image.jpg" class="mini-image-preview" alt="placeholder-mini" />
                 <h1 class="txt1"
-                style="margin-top: 30px;">Application Description</h1>
-                <p class="txt1-p">Description should be here</p>
+                style="margin-top: 10px;
+                       font-size: 35px;">Application Name</h1>
+                <p class="txt1-p">Application Description </p>
+                <h1 class="txt1"
+                    style="font-size: 18px;">Tags</h1>
+
+                <input class="back-button"
+                       style="margin-top: auto;
+                              margin-left: auto;"
+                       type="button" value="Back" @onclick="qcuUnitBackToHome" />
             </div>
         </section>
     </div>
 </div>
 
+@inject IJSRuntime JS
 @code {
+    private string StoreSideBarClass = "closed";
+    private string StoreSideBarButtonClass = "";
     private void qcuUnitLogin()
     {
         Navigation.NavigateTo("/login");
@@ -38,5 +50,10 @@
     private void qcuUnitBackToHome()
     {
         Navigation.NavigateTo("/Home");
+    }
+    private void ToggleStoreSidebar()
+    {
+        StoreSideBarClass = StoreSideBarClass == "closed" ? "open" : "closed";
+        StoreSideBarButtonClass = StoreSideBarClass == "open" ? "open" : "";
     }
 }

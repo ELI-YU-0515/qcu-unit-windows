@@ -3,17 +3,17 @@
     color: white;
     font-weight: 600;
 }
-.tx1 {
+.txt1 {
     font-size: 20px;
 }
-.tx1-p {
-    font-size: 14px;
+.txt1-p {
+    font-size: 19px;
 }
 .store-layout {
     display: flex;
     flex-direction: row;
     height: 100vh;
-    background: linear-gradient(to right, #3674e1, #a1c4fd);
+    background: linear-gradient(to right, #062454, #1448A3);
     font-family: 'Poppins';
     margin: 0;
 }
@@ -34,7 +34,32 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     color: #333;
     gap: 20px;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    position: fixed;
+    transform: translateX(-100%);
 }
+    .store-sidebar.open {
+        transform: translateX(0);
+    }
+.toggle-store-sidebar-button {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1100;
+    background-color: #3674e1;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+    .toggle-store-sidebar-button.open {
+        transform: rotate(180deg);
+    }
 .store-content-container {
     display: flex;
     flex-direction: column;
@@ -56,8 +81,9 @@
 }
 .main-image-preview {
     border-radius: 15px;
-    width: 550px;
-    height: 450px;
+    object-fit: cover;
+    height: 500px;
+    width: 750px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
 }
 .mini-image-preview {
@@ -74,6 +100,7 @@
 .image-section2 {
     display: flex;
     flex-direction: column;
+    width: 350px;
 }
 .back-button {
     background-color: #b83930;
@@ -153,6 +180,21 @@
     .back-button:hover {
         background-color: #c9302c; /* deeper red on hover */
     }
+.upload-button {
+    background-color: #3c8dbc; /* consistent blue */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    margin-left: 8px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .upload-button:hover {
+        background-color: #295b8f; /* deeper blue on hover */
+    }
 
 /*POPUP MODULE*/
 .popup-overlay {
@@ -180,6 +222,9 @@
     max-height: 80vh;
     overflow-y: auto;
 }
+    .popup-modal p {
+        margin-top: 16px;
+    }
 .return-button {
     background-color: #d9534f;
     color: white;
@@ -193,4 +238,32 @@
     .return-button:hover {
         background-color: #c9302c;
     }
+.upload-zip-button {
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 16px;
+    margin-right: 350px;
+    transition: background-color 0.3s;
+}
 
+    .upload-zip-button:hover {
+        background-color: #449d44;
+    }
+
+.upload-container {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 16px;
+    padding: 15px 23px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    min-height: 400px;
+    max-width: 800px;
+    max-height: 70vh;
+    overflow-y: auto;
+    margin-top: 16px;
+}

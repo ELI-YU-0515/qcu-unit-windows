@@ -82,16 +82,22 @@
                 Upload Zip File
                 <InputFile OnChange="HandleFileSelectedAsync" accept=".zip" style="display:none" />
             </label>
-            <button class="return-button" @onclick="ClosePopup">Return</button>
+            <button class="save-button" @onclick="ClosePopup">Save</button>
+            <button class="return-button" @onclick="ClosePopup">Cancel</button>
             <div class="upload-container">
-
+                <div class="image-container" id="image-container">
+                </div>
+                <textarea class="title-text-field" id="textInput" rows="2" cols="50" placeholder="Add Title"></textarea>
+                <button class="add-image-button">Add Image
+                    <input type="file" accept=".jpg, .jpeg, .png" style="display:none"/>
+                </button>                    <!-- pag tinanggal yung style="" gumagana pero pangit result ng button -->
+                <textarea class="description-text-field" id="textInput" rows="3" cols="40" placeholder="Add Description"></textarea>
+                <textarea class="instruction-text-field" id="textInput" rows="3" cols="40" placeholder="Add Instructions(Optional)"></textarea>
             </div>
             <p>Kindly upload your system in ZIP format.</p>
         </div>
     </div>
 }
-
-
 
 
 @code {

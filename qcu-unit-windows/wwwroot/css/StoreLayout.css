@@ -211,13 +211,13 @@
     z-index: 1000;
 }
 .popup-modal {
-    background: rgba(255, 255, 255, 0.8);
+    background-color: #ffa07a;
     border-radius: 16px;
     padding: 24px 32px;
     text-align: center;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     width: 80%;
-    min-height:600px;
+    min-height: 600px;
     max-width: 800px;
     max-height: 80vh;
     overflow-y: auto;
@@ -238,8 +238,22 @@
     .return-button:hover {
         background-color: #c9302c;
     }
-.upload-zip-button {
+.save-button {
     background-color: #5cb85c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: background-color 0.3s;
+}
+
+    .save-button:hover {
+        background-color: #449d44;
+    }
+.upload-zip-button {
+    background-color: #4ca9d4;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -251,19 +265,42 @@
 }
 
     .upload-zip-button:hover {
-        background-color: #449d44;
+        background-color: #004c99;
     }
 
 .upload-container {
     background: rgba(255, 255, 255, 0.8);
     border-radius: 16px;
     padding: 15px 23px;
-    text-align: center;
+    text-align: left;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     width: 100%;
     min-height: 400px;
     max-width: 800px;
-    max-height: 70vh;
-    overflow-y: auto;
+    max-height: 200px;
     margin-top: 16px;
+    overflow: auto;
 }
+    .upload-container textarea {
+        border-radius: 10px;
+        overflow: auto;
+    }
+.title-text-field {
+    margin-top: 200px;
+}
+.add-image-button {
+    background-color: #4ca9d4;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-left: 70px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    .add-image-button:hover {
+        background-color: #004c99;
+    }

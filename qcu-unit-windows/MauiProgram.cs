@@ -36,6 +36,8 @@ namespace qcu_unit_windows
 
             // ✅ Register your custom FirebaseAuthService
             builder.Services.AddSingleton<FirebaseAuthService>();
+            builder.Services.AddSingleton<EmailServices>();
+
 
             return builder.Build();
         }

@@ -361,3 +361,11 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+
+# Firebase Admin SDK JSONs
+qcu-repo-dbf94-firebase-adminsdk-fbsvc-d6e2ccaa40.json
+qcu-repo-dbf94-firebase-adminsdk-fbsvc-01973896d7.json
+
+# SendGrid API file
+Services/EmailServices.cs

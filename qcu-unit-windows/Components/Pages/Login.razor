@@ -6,6 +6,9 @@
 @inject IJSRuntime JSRuntime
 @inject FirebaseAuthService firebaseAuthService
 @inject EmailServices emailService
+@inject FirestoreService fireStoreService
+@using Firebase.Auth
+@using Google.Cloud.Firestore
 
 <div class="loginn-layout">
     <div class="horizontal-box">
@@ -13,7 +16,7 @@
         <div class="welcome-box">
             <h1>Welcome to QCU Repository</h1>
             <br /><br /><br />
-            <p>This platform allows you to pterss, store, and manage QCU resources easily.</p><br /><br />
+            <p>This platform allows you to press, store, and manage QCU resources easily.</p><br /><br />
             <p>Please log in to continue.</p>
         </div>
 
@@ -36,11 +39,10 @@
                     <p><strong>Example: QCU-201234-guzman</strong></p>
                 </div>
 
-                <input type="button" value="Dev: Skip to First Time Loggin In?" style="margin-top:10px; color:red;" @onclick="SkipToPrompt2" />
-
+                <input type="button" value="Dev: Skip to First Time Logging In?" style="margin-top:10px; color:red;" @onclick="SkipToPrompt2" />
             </div>
 
-            <!-- Step 2: Verification (First time login) -->
+            <!-- Step 2: Verification -->
             <div class="prompt-2" style="@(!showPrompt2 ? "display:none;" : "")">
                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @onclick="ReturnToPrompt1" class="svg-button">
                     <path d="M19 12H5"></path>
@@ -49,24 +51,15 @@
                 <br /><br /><br />
 
                 <h2>First Time Logging In?</h2>
-                <p>For account authentication, we sent a 6-digit code to your email account.</p>
+                <p>We’ve sent a 6-digit code to your email.</p>
 
-                <input id="temp-code"
-                       name="temp-code-no-autofill"
-                       type="text"
-                       placeholder="Enter 6-Digit Code"
-                       maxlength="6"
-                       inputmode="numeric"
-                       pattern="\d*"
-                       autocomplete="new-password"
-                       autocorrect="off"
-                       spellcheck="false"
-                       @bind="verificationCode"
-                       @bind:event="oninput"
+                <input id="temp-code" placeholder="Enter 6-Digit Code"
+                       maxlength="6" inputmode="numeric" pattern="\d*"
+                       autocomplete="new-password" spellcheck="false"
+                       @bind="verificationCode" @bind:event="oninput"
                        @onkeypress="ValidateKeypress" />
 
-                <input id="Submit" type="button" value="Submit" @onclick="HandleVerificationSubmit" />
-                <!-- Developer Shortcut to Prompt-3 -->
+                <input type="button" value="Submit" @onclick="HandleVerificationSubmit" />
                 <input type="button" value="Dev: Skip to Create Password" style="margin-top:10px; color:red;" @onclick="SkipToPrompt3" />
             </div>
 
@@ -77,15 +70,15 @@
                     <path d="M12 5l-7 7 7 7"></path>
                 </svg>
                 <br /><br /><br />
+
                 <h2>Change Password</h2>
-                <p>For security purposes, please create a new password for QCUREPO</p>
+                <p>Create a new password for QCUREPO:</p>
                 <input id="new-pass-1" placeholder="Create Password" type="password" @bind="newPassword" />
                 <input id="new-pass-2" placeholder="Re-Enter Password" type="password" @bind="confirmPassword" />
-                <p>Password must include CAPITALIZED LETTERS, special symbols, and Numbers</p>
+                <p>Password must include CAPITAL LETTERS, Symbols, and Numbers.</p>
 
-                <input id="Create-Pass" style="margin: 30px 0;" type="button" value="Create Password" @onclick="HandleCreatePassword" />
+                <input type="button" value="Create Password" @onclick="HandleCreatePassword" style="margin: 30px 0;" />
                 <input type="button" value="Dev: Skip to Main Dashboard" style="margin-top:10px; color:red;" @onclick="SkipToDashboard" />
-
             </div>
 
         </div>
@@ -95,24 +88,21 @@
 @code {
     private string email = string.Empty;
     private string password = string.Empty;
-    private string verificationCode { get; set; } = string.Empty;
-    private string phoneNumber { get; set; } = string.Empty;
+    private string verificationCode = string.Empty;
     private string newPassword = string.Empty;
     private string confirmPassword = string.Empty;
+    private string currentUserId = string.Empty;
+    private string generatedCode = string.Empty;
 
     private bool showPrompt1 = true;
     private bool showPrompt2 = false;
     private bool showPrompt3 = false;
 
-    private async Task ShowPasswordInstructions()
-    {
+    private async Task ShowPasswordInstructions() =>
         await JSRuntime.InvokeVoidAsync("showPasswordInstructions");
-    }
 
-    private async Task HidePasswordInstructions()
-    {
+    private async Task HidePasswordInstructions() =>
         await JSRuntime.InvokeVoidAsync("hidePasswordInstructions");
-    }
 
     private async Task HandleLogin()
     {
@@ -124,16 +114,19 @@
 
         try
         {
-            var token = await firebaseAuthService.LoginUser(email, password);
-            if (!string.IsNullOrEmpty(token))
+            var userCredential = await firebaseAuthService.SignInWithEmailPassword(email, password);
+            if (userCredential != null)
             {
+                currentUserId = userCredential.LocalId; // Use LocalId here, since FirebaseLoginResponse doesn't have a User property.
+
                 showPrompt1 = false;
                 showPrompt2 = true;
+
                 await SendVerificationEmail();
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("alert", "Invalid login credentials.");
+                await JSRuntime.InvokeVoidAsync("alert", "Login failed.");
             }
         }
         catch (Exception ex)
@@ -142,33 +135,35 @@
         }
     }
 
+
+    private async Task SendVerificationEmail()
+    {
+        generatedCode = new Random().Next(100000, 999999).ToString();
+        var sent = await emailService.SendVerificationCodeAsync(email, "User", generatedCode);
+
+        if (sent)
+            await JSRuntime.InvokeVoidAsync("alert", "Verification code sent to your email.");
+        else
+            await JSRuntime.InvokeVoidAsync("alert", "Failed to send code.");
+    }
+
     private async Task HandleVerificationSubmit()
     {
-        if (!string.IsNullOrEmpty(verificationCode))
+        if (!IsSixDigitCode(verificationCode))
         {
-            if (!IsSixDigitCode(verificationCode))
-            {
-                await JSRuntime.InvokeVoidAsync("alert", "Verification code must be exactly 6 digits.");
-                return;
-            }
+            await JSRuntime.InvokeVoidAsync("alert", "Code must be exactly 6 digits.");
+            return;
+        }
 
-            if (verificationCode != generatedCode)
-            {
-                await JSRuntime.InvokeVoidAsync("alert", "Invalid verification code. Please try again.");
-                return;
-            }
+        if (verificationCode != generatedCode)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Invalid code.");
+            return;
         }
 
         showPrompt2 = false;
         showPrompt3 = true;
     }
-
-    private bool IsSixDigitCode(string input)
-    {
-        return input.Length == 6 && input.All(char.IsDigit);
-    }
-
-
 
     private async Task HandleCreatePassword()
     {
@@ -180,19 +175,53 @@
 
         if (!IsValidPassword(newPassword))
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Password must contain uppercase letters, special symbols, and numbers.");
+            await JSRuntime.InvokeVoidAsync("alert", "Include uppercase, numbers, and symbols.");
             return;
         }
 
-        // Save the new password or perform further logic
-        Navigation.NavigateTo("/home");
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "User not found.");
+            return;
+        }
+
+        try
+        {
+            // Assuming you're using Firebase Firestore SDK, make sure to initialize Firestore correctly
+            var firestoreDb = FirestoreDb.Create("your_project_id");
+            var userDocRef = firestoreDb.Collection("users").Document(currentUserId);
+            var updateData = new Dictionary<string, object>
+        {
+            { "permanent_password", newPassword },
+            { "has_permanent_password", true }
+        };
+
+            await userDocRef.UpdateAsync(updateData);
+            await JSRuntime.InvokeVoidAsync("alert", "Password updated!");
+
+            Navigation.NavigateTo("/home");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Firestore Error: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", "Error saving password.");
+        }
     }
 
-    private bool IsValidPassword(string password)
+
+    private void ValidateKeypress(KeyboardEventArgs e)
     {
-        // Implement a simple password validation (check for uppercase, numbers, and special symbols)
-        return password.Any(char.IsUpper) && password.Any(char.IsDigit) && password.Any(c => !char.IsLetterOrDigit(c));
+        if (e.Key.Length == 1 && !char.IsDigit(e.Key[0]))
+        {
+            JSRuntime.InvokeVoidAsync("alert", "Only digits allowed.");
+        }
     }
+
+    private bool IsSixDigitCode(string code) =>
+        code.Length == 6 && code.All(char.IsDigit);
+
+    private bool IsValidPassword(string pass) =>
+        pass.Any(char.IsUpper) && pass.Any(char.IsDigit) && pass.Any(c => !char.IsLetterOrDigit(c));
 
     private void ReturnToPrompt1()
     {
@@ -206,66 +235,23 @@
         showPrompt3 = false;
     }
 
-    /* EMAIL SERVICE SEND GRID */
-    private string generatedCode = string.Empty;
-
-    private async Task SendVerificationEmail()
-    {
-        generatedCode = new Random().Next(100000, 999999).ToString();
-        bool sent = await emailService.SendVerificationCodeAsync(email, "User", generatedCode);
-
-        if (sent)
-        {
-            await JSRuntime.InvokeVoidAsync("alert", "Verification code sent to your email.");
-        }
-        else
-        {
-            await JSRuntime.InvokeVoidAsync("alert", "Failed to send verification code.");
-        }
-    }
-
-
-
-    private void ValidateKeypress(KeyboardEventArgs e)
-    {
-        if (e.Key.Length == 1 && !char.IsDigit(e.Key[0]))
-        {
-            JSRuntime.InvokeVoidAsync("alert", "Only digits allowed.");
-        }
-    }
-
-
-
-    private void HandleCodeInput(ChangeEventArgs e)
-    {
-        var input = e.Value?.ToString();
-        verificationCode = new string(input?.Where(char.IsDigit).ToArray() ?? Array.Empty<char>());
-    }
-
     private void SkipToPrompt2()
     {
-        showPrompt2 = true;
         showPrompt1 = false;
+        showPrompt2 = true;
     }
-
 
     private void SkipToPrompt3()
     {
         showPrompt2 = false;
         showPrompt3 = true;
-
     }
-    private void SkipToDashboard()
-    {
+
+    private void SkipToDashboard() =>
         Navigation.NavigateTo("/home");
-    }
-
 }
 
-
-
 <script>
-
     window.showPasswordInstructions = () => {
         document.getElementById("password-instructions").style.display = "block";
     };

@@ -369,3 +369,6 @@ qcu-repo-dbf94-firebase-adminsdk-fbsvc-01973896d7.json
 
 # SendGrid API file
 Services/EmailServices.cs
+
+# Ignore launchSettings.json to prevent API keys from being committed
+Properties/launchSettings.json

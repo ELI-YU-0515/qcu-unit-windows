@@ -1,32 +1,46 @@
-﻿using Firebase.Auth.Providers;
-using Firebase.Auth;
+﻿using qcu_unit_windows.Properties;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 public class FirebaseAuthService
 {
-    private readonly FirebaseAuthClient _authClient;
+    private readonly string apiKey = "your-api-key"; // Your Firebase API Key
+    private readonly HttpClient httpClient = new();
 
-    public FirebaseAuthService()
+    public async Task<FirebaseLoginResponse?> SignInWithEmailPassword(string email, string password)
     {
-        var config = new FirebaseAuthConfig
+        var request = new
         {
-            ApiKey = "AIzaSyDFhJ1SBO3M2AFstZyz50fwXdx57POB3N0",
-            AuthDomain = "qcu-repo-dbf94.firebaseapp.com",
-            Providers = new FirebaseAuthProvider[] { new EmailProvider() }
+            email = email,
+            password = password,
+            returnSecureToken = true
         };
 
-        _authClient = new FirebaseAuthClient(config);
-    }
+        var response = await httpClient.PostAsJsonAsync(
+            $"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={apiKey}",
+            request
+        );
 
-    public async Task<string> LoginUser(string email, string password)
-    {
-        try
+        if (response.IsSuccessStatusCode)
         {
-            var userCredential = await _authClient.SignInWithEmailAndPasswordAsync(email, password);
-            return userCredential.User.Credential.IdToken;
+            var content = await response.Content.ReadAsStringAsync();
+            var jsonDoc = JsonDocument.Parse(content);
+
+            var idToken = jsonDoc.RootElement.GetProperty("idToken").GetString() ?? string.Empty;
+            var localId = jsonDoc.RootElement.GetProperty("localId").GetString() ?? string.Empty;
+
+            return new FirebaseLoginResponse
+            {
+                IdToken = idToken,
+                LocalId = localId
+            };
         }
-        catch (Exception ex)
+        else
         {
-            throw new Exception($"Login failed: {ex.Message}");
+            Console.WriteLine($"Login failed: {await response.Content.ReadAsStringAsync()}");
+            return null;
         }
     }
 }

@@ -7,17 +7,17 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<div class="home-sidebar">
+<button class="toggle-sidebar-button @sidebarButtonClass" @onclick="ToggleSidebar">
+    &#8594;
+</button>
+
+<div class="sidebar-overlay @(sidebarClass == "open" ? "visible" : "")" @onclick="ToggleSidebar"></div>
+<div class="home-sidebar @sidebarClass">
     <h1 class="txt1-headline">QCU Repo</h1>
-
-    <label class="my-systems-button">
-        Import System
-        <InputFile OnChange="HandleFileSelectedAsync" accept=".zip" style="display:none" />
-    </label>
-
-    <button class="back-button" @onclick="home">Back</button>
+    <button class="my-systems-button" @onclick="MySystems">My Systems</button>
     <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
 </div>
+
 
 <div class="home-layout2">
     <section class="search-section">
@@ -87,10 +87,20 @@
             <div class="upload-container">
                 <div class="image-container" id="image-container">
                 </div>
+                <div class="image-container">
+                    @if (!string.IsNullOrEmpty(imagePreviewUrl))
+                    {
+                        <div style="position: relative; display: inline-block; margin-top: 10px;">
+                            <img src="@imagePreviewUrl" class="image" style="max-width: 200px; max-height: 200px; border: 1px solid #ccc;" />
+                            <button @onclick="RemoveImage" class="delete-button">×</button>
+                        </div>
+                    }
+                </div>
                 <textarea class="title-text-field" id="textInput" rows="2" cols="50" placeholder="Add Title"></textarea>
-                <button class="add-image-button">Add Image
-                    <input type="file" accept=".jpg, .jpeg, .png" style="display:none"/>
-                </button>                    <!-- pag tinanggal yung style="" gumagana pero pangit result ng button -->
+                <label class="add-image-button">
+                    Add Image
+                    <InputFile OnChange="ImageSelectedAsync" accept=".jpg,.jpeg,.png" style="display:none" />
+                </label>
                 <textarea class="description-text-field" id="textInput" rows="3" cols="40" placeholder="Add Description"></textarea>
                 <textarea class="instruction-text-field" id="textInput" rows="3" cols="40" placeholder="Add Instructions(Optional)"></textarea>
             </div>
@@ -113,6 +123,26 @@
         }
     }
 
+    private string? imagePreviewUrl;
+
+    private async Task ImageSelectedAsync(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        if (file != null)
+        {
+            using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            var bytes = memoryStream.ToArray();
+
+            imagePreviewUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(bytes)}";
+        }
+    }
+    private void RemoveImage()
+    {
+        imagePreviewUrl = null;
+    }
     private void qcuUnitLogin()
     {
         Navigation.NavigateTo("/login");
@@ -150,5 +180,13 @@
         showPopup = false;
     }
 
+    private string sidebarClass = "closed";
+    private string sidebarButtonClass = "";
+    private void ToggleSidebar()
+    {
+        sidebarClass = sidebarClass == "closed" ? "open" : "closed";
+        sidebarButtonClass = sidebarClass == "open" ? "open" : "";
+    }
+    private void MySystems() => Navigation.NavigateTo("/mysystem");
 
 }

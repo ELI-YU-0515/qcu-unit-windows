@@ -30,7 +30,7 @@
         <h1 class="txt1 featured-title2">My Systems</h1>
         <div class="button-group2">
             <input class="back-button" type="button" value="Back" @onclick="home" />
-            <input class="upload-button" type="button" value="Upload" @onclick="OpenPopup" />
+            <input class="upload-button" type="button" value="Upload" @onclick="OpenPopupForNew" />
         </div>
     </div>
 
@@ -45,12 +45,13 @@
                     {
                         <img src="@system.ImageUrl" alt="System Image" style="max-width: 200px; max-height: 200px; border: 1px solid #ccc;" />
                     }
-                    <p><strong>Title:</strong> @system.Title</p>
-                    <p><strong>Description:</strong> @system.Description</p>
-                    <p><strong>Instructions:</strong> @system.Instructions</p>
-                    <p><strong>Zip File:</strong> @system.ZipFileName</p>
+                    <p><strong>Title</strong> @system.Title</p>
+                    <p><strong>Description</strong> @system.Description</p>
+                    <p><strong>Instructions</strong> @system.Instructions</p>
+                    <p><strong>Zip File</strong> @system.ZipFileName</p>
                     <div style="margin-top: 10px;">
                         <button class="remove-button" @onclick="@(() => DeleteUploadedSystem(system))">Delete</button>
+                        <button class="edit-button" @onclick="@(() => OpenPopupForEdit(system))">Edit</button>
                     </div>
                 </div>
             }
@@ -62,28 +63,31 @@
 {
     <div class="popup-overlay">
         <div class="popup-modal">
-            <h2>Upload</h2>
+            <h2>@(isEditMode ? "Edit" : "Upload")</h2>
+
             <div class="upper-buttons">
-				<label class="upload-zip-button">
-					Upload Zip File <span class="required">*</span>
-					<InputFile OnChange="HandleFileSelectedAsync" accept=".zip" style="display:none" />
-				</label>
-				@if (showValidation && string.IsNullOrWhiteSpace(tempZipFileName))
-				{
-					<p class="validation-error">ZIP file is required.</p>
-				}
+                <label class="upload-zip-button">
+                    Upload Zip File <span class="required">*</span>
+                    <InputFile OnChange="HandleFileSelectedAsync" accept=".zip" style="display:none" />
+                </label>
+                @if (showValidation && string.IsNullOrWhiteSpace(tempZipFileName))
+                {
+                    <p class="validation-error-zip">ZIP file is required.</p>
+                }
 
-				@if (!string.IsNullOrEmpty(tempZipFileName))
-				{
-					<div>
-						<p>@tempZipFileName</p>
-					</div>
-				}
+                @if (!string.IsNullOrEmpty(tempZipFileName))
+                {
+                    <div>
+                        <p class="validation-error-zip">@tempZipFileName</p>
+                    </div>
+                }
 
-				<button class="save-button" @onclick="SaveSystem">Save</button>
-				<button class="return-button" @onclick="ClosePopup">Cancel</button>
+                <div style="text-align: right;">
+                    <button class="save-button" @onclick="SaveSystem">Save</button>
+                    <button class="return-button" @onclick="ClosePopup">Cancel</button>
+                </div>
             </div>
-            
+
             <div class="upload-container">
                 <div class="image-container">
                     @if (!string.IsNullOrEmpty(imagePreviewUrl))
@@ -127,18 +131,6 @@
     </div>
 }
 
-<style>
-    .required {
-        color: red;
-        font-weight: bold;
-    }
-
-    .validation-error {
-        color: red;
-        font-size: 0.9em;
-        margin: 4px 0 10px;
-    }
-</style>
 
 @code {
     private List<UploadedSystem> uploadedSystems = new();
@@ -152,17 +144,37 @@
 
     private bool showPopup = false;
     private bool showValidation = false;
+    private bool isEditMode = false;
+    private UploadedSystem? editingSystem = null;
 
-    private void OpenPopup()
+    private void OpenPopupForNew()
     {
+        isEditMode = false;
         showValidation = false;
+        editingSystem = null;
         showPopup = true;
+        ClearPopupFields();
+    }
+
+    private void OpenPopupForEdit(UploadedSystem system)
+    {
+        isEditMode = true;
+        editingSystem = system;
+        title = system.Title;
+        description = system.Description;
+        instruction = system.Instructions;
+        tempZipFileName = system.ZipFileName;
+        imagePreviewUrl = system.ImageUrl;
+        showPopup = true;
+        showValidation = false;
     }
 
     private void ClosePopup()
     {
         ClearPopupFields();
         showPopup = false;
+        editingSystem = null;
+        isEditMode = false;
     }
 
     private void ClearPopupFields()
@@ -214,14 +226,25 @@
 
         if (isValid)
         {
-            uploadedSystems.Add(new UploadedSystem
-                {
-                    Title = title!,
-                    Description = description,
-                    Instructions = instruction,
-                    ZipFileName = tempZipFileName!,
-                    ImageUrl = imagePreviewUrl
-                });
+            if (isEditMode && editingSystem != null)
+            {
+                editingSystem.Title = title!;
+                editingSystem.Description = description;
+                editingSystem.Instructions = instruction;
+                editingSystem.ZipFileName = tempZipFileName!;
+                editingSystem.ImageUrl = imagePreviewUrl;
+            }
+            else
+            {
+                uploadedSystems.Add(new UploadedSystem
+                    {
+                        Title = title!,
+                        Description = description,
+                        Instructions = instruction,
+                        ZipFileName = tempZipFileName!,
+                        ImageUrl = imagePreviewUrl
+                    });
+            }
 
             ClosePopup();
         }

@@ -330,6 +330,11 @@
 
 .edit-button {
     background-color: steelblue;
+    margin-left: 5px;
+    background-color: #4CAF50;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
 }
 
 .add-image-button {
@@ -357,4 +362,25 @@
     font-size: 0.8em;
     white-space: nowrap;
     transform: translateY(1.5em);
+}
+.required {
+    color: red;
+    font-weight: bold;
+}
+
+.validation-error {
+    color: red;
+    font-size: 0.9em;
+    margin: 4px 0 10px;
+}
+.validation-error-zip {
+    color: red;
+    font-size: 0.9em;
+    text-align: left;
+    padding: 10px;
+}
+
+.general-box p{
+    margin-left: 30px;
+    color: white;
 }

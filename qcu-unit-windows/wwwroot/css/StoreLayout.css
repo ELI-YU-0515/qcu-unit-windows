@@ -225,6 +225,9 @@
     .popup-modal p {
         margin-top: 16px;
     }
+.upper-buttons{
+    text-align: right;
+}
 .return-button {
     background-color: #d9534f;
     color: white;
@@ -233,6 +236,7 @@
     border-radius: 8px;
     cursor: pointer;
     margin-top: 16px;
+    float: right;
     transition: background-color 0.3s;
 }
     .return-button:hover {
@@ -246,6 +250,7 @@
     border-radius: 8px;
     cursor: pointer;
     margin-top: 16px;
+    margin-right: 10px;
     transition: background-color 0.3s;
 }
 
@@ -260,7 +265,8 @@
     border-radius: 8px;
     cursor: pointer;
     margin-top: 16px;
-    margin-right: 350px;
+    margin-left: 10px;
+    float: left;
     transition: background-color 0.3s;
 }
 
@@ -310,18 +316,29 @@
     cursor: pointer;
     font-weight: bold;
 }
-
-.title-text-field {
-    margin-top: 50px;
+.remove-button, .edit-button {
+    margin: 4px;
+    padding: 4px 8px;
+    border: none;
+    color: white;
+    cursor: pointer;
 }
+
+.remove-button {
+    background-color: crimson;
+}
+
+.edit-button {
+    background-color: steelblue;
+}
+
 .add-image-button {
     background-color: #4ca9d4;
     color: white;
     border: none;
     padding: 10px 20px;
     border-radius: 8px;
-    margin-left: 70px;
-    margin-right: 5px;
+    float: right;
     margin-bottom: 10px;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -330,3 +347,14 @@
     .add-image-button:hover {
         background-color: #004c99;
     }
+.required[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    background: #333;
+    color: #fff;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    white-space: nowrap;
+    transform: translateY(1.5em);
+}

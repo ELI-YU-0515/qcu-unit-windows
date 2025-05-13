@@ -18,7 +18,6 @@
     <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
 </div>
 
-
 <div class="home-layout2">
     <section class="search-section">
         <div class="search-bar">
@@ -26,9 +25,6 @@
             <button>Search</button>
         </div>
     </section>
-
-
-
 
     <div class="title-box">
         <h1 class="txt1 featured-title2">My Systems</h1>
@@ -38,55 +34,57 @@
         </div>
     </div>
 
-
-
-
-    <div class="mysystem-recent">
-        <h1 class="txt1 featured-title3">Recently Opened</h1>
-    </div>
-
-
-
     <div class="mysystem-installed">
         <h1 class="txt1 featured-title3">Uploaded Systems</h1>
 
         <div class="general-grid">
-            @for (int i = 1; i <= 20; i++) // 4x5 = 20 items
+            @foreach (var system in uploadedSystems)
             {
-                <div class="general-box" @onclick="() => OnGeneralItemClick(i)">
-                    <p>Item @i</p>
+                <div class="general-box">
+                    @if (!string.IsNullOrEmpty(system.ImageUrl))
+                    {
+                        <img src="@system.ImageUrl" alt="System Image" style="max-width: 200px; max-height: 200px; border: 1px solid #ccc;" />
+                    }
+                    <p><strong>Title:</strong> @system.Title</p>
+                    <p><strong>Description:</strong> @system.Description</p>
+                    <p><strong>Instructions:</strong> @system.Instructions</p>
+                    <p><strong>Zip File:</strong> @system.ZipFileName</p>
+                    <div style="margin-top: 10px;">
+                        <button class="remove-button" @onclick="@(() => DeleteUploadedSystem(system))">Delete</button>
+                    </div>
                 </div>
             }
         </div>
-
-    </div>
-
-
-    <div class="no-scrollbar featured-grid">
-        @foreach (var zipFile in importedZips)
-        {
-            <div class="home-content-container">
-                <p>@zipFile</p>
-            </div>
-        }
     </div>
 </div>
-
 
 @if (showPopup)
 {
     <div class="popup-overlay">
         <div class="popup-modal">
             <h2>Upload</h2>
-            <label class="upload-zip-button">
-                Upload Zip File
-                <InputFile OnChange="HandleFileSelectedAsync" accept=".zip" style="display:none" />
-            </label>
-            <button class="save-button" @onclick="ClosePopup">Save</button>
-            <button class="return-button" @onclick="ClosePopup">Cancel</button>
+            <div class="upper-buttons">
+				<label class="upload-zip-button">
+					Upload Zip File <span class="required">*</span>
+					<InputFile OnChange="HandleFileSelectedAsync" accept=".zip" style="display:none" />
+				</label>
+				@if (showValidation && string.IsNullOrWhiteSpace(tempZipFileName))
+				{
+					<p class="validation-error">ZIP file is required.</p>
+				}
+
+				@if (!string.IsNullOrEmpty(tempZipFileName))
+				{
+					<div>
+						<p>@tempZipFileName</p>
+					</div>
+				}
+
+				<button class="save-button" @onclick="SaveSystem">Save</button>
+				<button class="return-button" @onclick="ClosePopup">Cancel</button>
+            </div>
+            
             <div class="upload-container">
-                <div class="image-container" id="image-container">
-                </div>
                 <div class="image-container">
                     @if (!string.IsNullOrEmpty(imagePreviewUrl))
                     {
@@ -96,97 +94,163 @@
                         </div>
                     }
                 </div>
-                <textarea class="title-text-field" id="textInput" rows="2" cols="50" placeholder="Add Title"></textarea>
+
                 <label class="add-image-button">
-                    Add Image
+                    Add Image <span class="required">*</span>
                     <InputFile OnChange="ImageSelectedAsync" accept=".jpg,.jpeg,.png" style="display:none" />
-                </label>
-                <textarea class="description-text-field" id="textInput" rows="3" cols="40" placeholder="Add Description"></textarea>
-                <textarea class="instruction-text-field" id="textInput" rows="3" cols="40" placeholder="Add Instructions(Optional)"></textarea>
+                </label><br />
+                @if (showValidation && string.IsNullOrWhiteSpace(imagePreviewUrl))
+                {
+                    <p class="validation-error">Image is required.</p>
+                }
+
+                <label class="field-label">Title <span class="required">*</span></label><br />
+                <textarea class="title-text-field" @bind="title" rows="2" cols="50" placeholder="Add Title"></textarea><br />
+                @if (showValidation && string.IsNullOrWhiteSpace(title))
+                {
+                    <p class="validation-error">Title is required.</p>
+                }
+
+                <label class="field-label">Description <span class="required">*</span></label><br />
+                <textarea class="description-text-field" @bind="description" rows="3" cols="40" placeholder="Add Description"></textarea><br />
+                @if (showValidation && string.IsNullOrWhiteSpace(description))
+                {
+                    <p class="validation-error">Description is required.</p>
+                }
+
+                <label class="field-label">Instructions (Optional)</label><br />
+                <textarea class="instruction-text-field" @bind="instruction" rows="3" cols="40" placeholder="Add Instructions (Optional)"></textarea>
             </div>
+
             <p>Kindly upload your system in ZIP format.</p>
         </div>
     </div>
 }
 
+<style>
+    .required {
+        color: red;
+        font-weight: bold;
+    }
+
+    .validation-error {
+        color: red;
+        font-size: 0.9em;
+        margin: 4px 0 10px;
+    }
+</style>
 
 @code {
-    private List<string> importedZips = new();
+    private List<UploadedSystem> uploadedSystems = new();
+
+    private string? imagePreviewUrl;
+    private string? title;
+    private string? description;
+    private string? instruction;
+    private string? tempZipFileName;
+    private byte[]? tempZipBytes;
+
+    private bool showPopup = false;
+    private bool showValidation = false;
+
+    private void OpenPopup()
+    {
+        showValidation = false;
+        showPopup = true;
+    }
+
+    private void ClosePopup()
+    {
+        ClearPopupFields();
+        showPopup = false;
+    }
+
+    private void ClearPopupFields()
+    {
+        title = description = instruction = tempZipFileName = imagePreviewUrl = null;
+        tempZipBytes = null;
+        showValidation = false;
+    }
 
     private async Task HandleFileSelectedAsync(InputFileChangeEventArgs e)
     {
         var file = e.File;
         if (file != null && file.Name.EndsWith(".zip"))
         {
-            importedZips.Add(file.Name);
-            await InvokeAsync(StateHasChanged); // refresh UI after adding
+            tempZipFileName = file.Name;
+            using var stream = file.OpenReadStream(20 * 1024 * 1024);
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            tempZipBytes = ms.ToArray();
         }
     }
-
-    private string? imagePreviewUrl;
 
     private async Task ImageSelectedAsync(InputFileChangeEventArgs e)
     {
         var file = e.File;
-
         if (file != null)
         {
-            using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
-            using var memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream);
-            var bytes = memoryStream.ToArray();
-
-            imagePreviewUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(bytes)}";
+            using var stream = file.OpenReadStream(10 * 1024 * 1024);
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            imagePreviewUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(ms.ToArray())}";
         }
     }
+
     private void RemoveImage()
     {
         imagePreviewUrl = null;
     }
-    private void qcuUnitLogin()
+
+    private void SaveSystem()
     {
-        Navigation.NavigateTo("/login");
+        showValidation = true;
+
+        bool isValid =
+            !string.IsNullOrWhiteSpace(title) &&
+            !string.IsNullOrWhiteSpace(description) &&
+            !string.IsNullOrWhiteSpace(tempZipFileName) &&
+            !string.IsNullOrWhiteSpace(imagePreviewUrl);
+
+        if (isValid)
+        {
+            uploadedSystems.Add(new UploadedSystem
+                {
+                    Title = title!,
+                    Description = description,
+                    Instructions = instruction,
+                    ZipFileName = tempZipFileName!,
+                    ImageUrl = imagePreviewUrl
+                });
+
+            ClosePopup();
+        }
     }
 
-    private void home()
+    private void DeleteUploadedSystem(UploadedSystem system)
     {
-        Navigation.NavigateTo("/home");
-    }
-    private void upload()
-    {
-        Navigation.NavigateTo("/home");
-    }
-
-
-
-
-    private void OnGeneralItemClick(int itemNumber)
-    {
-        Console.WriteLine($"Clicked on: Item {itemNumber}");
-        // Future logic goes here
-    }
-
-
-
-    private bool showPopup = false;
-
-    private void OpenPopup()
-    {
-        showPopup = true;
-    }
-
-    private void ClosePopup()
-    {
-        showPopup = false;
+        uploadedSystems.Remove(system);
     }
 
     private string sidebarClass = "closed";
     private string sidebarButtonClass = "";
+
     private void ToggleSidebar()
     {
         sidebarClass = sidebarClass == "closed" ? "open" : "closed";
         sidebarButtonClass = sidebarClass == "open" ? "open" : "";
     }
+
+    private void qcuUnitLogin() => Navigation.NavigateTo("/login");
+    private void home() => Navigation.NavigateTo("/home");
     private void MySystems() => Navigation.NavigateTo("/mysystem");
 
+    public class UploadedSystem
+    {
+        public string Title { get; set; } = "";
+        public string? Description { get; set; }
+        public string? Instructions { get; set; }
+        public string ZipFileName { get; set; } = "";
+        public string? ImageUrl { get; set; }
+    }
 }

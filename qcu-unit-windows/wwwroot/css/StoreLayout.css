@@ -166,7 +166,7 @@
     display: flex;
     gap: 10px; /* Adds spacing between Back and Upload */
 }
-.back-button {
+.dashboard-button {
     background-color: #d9534f; /* consistent red */
     color: white;
     border: none;
@@ -176,8 +176,11 @@
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    position: absolute;
+    bottom: 50px; /* space from bottom */
+    right: 50px; /* space from right */
 }
-    .back-button:hover {
+    .dashboard-button:hover {
         background-color: #c9302c; /* deeper red on hover */
     }
 .upload-button {
@@ -186,7 +189,7 @@
     border: none;
     padding: 8px 16px;
     margin-left: 8px;
-    font-size: 16px;
+    font-size: 20px;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -317,11 +320,13 @@
     font-weight: bold;
 }
 .remove-button, .edit-button {
-    margin: 4px;
+    margin-right: 20px;
+    margin-bottom: 10px;
     padding: 4px 8px;
     border: none;
     color: white;
     cursor: pointer;
+    border-radius: 4px;
 }
 
 .remove-button {
@@ -379,8 +384,21 @@
     text-align: left;
     padding: 10px;
 }
-
+.general-grid{
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* spacing between boxes */
+    padding: 10px;
+}
+.general-box  {
+    margin: 0px 20px 0px 20px;
+    color: #062454;
+    justify-content:left ;
+    
+}
 .general-box p{
-    margin-left: 30px;
-    color: white;
+    margin-left: 20px;
+}
+.dual-button {
+    float: right;
 }

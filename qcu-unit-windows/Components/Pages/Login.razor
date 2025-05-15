@@ -12,6 +12,7 @@
 
 <div class="loginn-layout">
     <div class="horizontal-box">
+
         <!-- Welcome Section -->
         <div class="welcome-box">
             <h1>Welcome to QCU Repository</h1>
@@ -24,14 +25,18 @@
         <div class="login-box">
 
             <!-- Step 1: Login -->
-            <div class="prompt-1" style="@(!showPrompt1 ? "display:none;" : "")">
+            <div class="prompt-1" style="display:block;">
                 <h1 style="text-align:center; margin-bottom:30px;">LOGIN</h1>
                 <p style="margin-bottom:60px;">Welcome to QCU-REPO</p>
 
                 <input id="login-email" placeholder="Email" type="email" @bind="email" />
-                <input id="login-password" placeholder="Password" type="password" @bind="password"
-                       @onfocus="ShowPasswordInstructions" @onblur="HidePasswordInstructions" />
-                <input id="login-button" type="button" value="LOGIN" @onclick="HandleLogin" />
+                <input id="login-password" placeholder="Password" type="password" @bind="password" />
+                <input id="login-button" type="button" value="LOGIN" @onclick="LoginAsync" />
+
+                @if (!string.IsNullOrEmpty(feedbackMessage))
+                {
+                    <p class="@feedbackClass" style="margin-top:10px;">0.0.0.0 says: @feedbackMessage</p>
+                }
 
                 <div id="password-instructions" class="password-instructions" style="display:none;">
                     <p>Password format should be like this:</p>
@@ -39,12 +44,12 @@
                     <p><strong>Example: QCU-201234-guzman</strong></p>
                 </div>
 
-                <input type="button" value="Dev: Skip to First Time Logging In?" style="margin-top:10px; color:red;" @onclick="SkipToPrompt2" />
+                <input type="button" value="Dev: Skip to First Time Logging In?" style="margin-top:10px; color:red;" @onclick="@(() => ShowStep(2))" />
             </div>
 
             <!-- Step 2: Verification -->
-            <div class="prompt-2" style="@(!showPrompt2 ? "display:none;" : "")">
-                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @onclick="ReturnToPrompt1" class="svg-button">
+            <div class="prompt-2" style="display:none;">
+                <svg @onclick="@(() => ShowStep(1))" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-button">
                     <path d="M19 12H5"></path>
                     <path d="M12 5l-7 7 7 7"></path>
                 </svg>
@@ -53,19 +58,20 @@
                 <h2>First Time Logging In?</h2>
                 <p>We’ve sent a 6-digit code to your email.</p>
 
-                <input id="temp-code" placeholder="Enter 6-Digit Code"
-                       maxlength="6" inputmode="numeric" pattern="\d*"
-                       autocomplete="new-password" spellcheck="false"
-                       @bind="verificationCode" @bind:event="oninput"
-                       @onkeypress="ValidateKeypress" />
+                <input id="temp-code" placeholder="Enter 6-Digit Code" maxlength="6" inputmode="numeric" pattern="\d*" autocomplete="new-password" spellcheck="false" @bind="verificationCode" />
+                <input type="button" value="Submit" @onclick="VerifyCodeAsync" />
 
-                <input type="button" value="Submit" @onclick="HandleVerificationSubmit" />
-                <input type="button" value="Dev: Skip to Create Password" style="margin-top:10px; color:red;" @onclick="SkipToPrompt3" />
+                @if (!string.IsNullOrEmpty(feedbackMessage))
+                {
+                    <p class="@feedbackClass" style="margin-top:10px;">0.0.0.0 says: @feedbackMessage</p>
+                }
+
+                <input type="button" value="Dev: Skip to Create Password" style="margin-top:10px; color:red;" @onclick="@(() => ShowStep(3))" />
             </div>
 
             <!-- Step 3: Create Password -->
-            <div class="prompt-3" style="@(!showPrompt3 ? "display:none;" : "")">
-                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @onclick="ReturnToPrompt2" class="svg-button">
+            <div class="prompt-3" style="display:none;">
+                <svg @onclick="@(() => ShowStep(2))" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-button">
                     <path d="M19 12H5"></path>
                     <path d="M12 5l-7 7 7 7"></path>
                 </svg>
@@ -73,12 +79,18 @@
 
                 <h2>Change Password</h2>
                 <p>Create a new password for QCUREPO:</p>
-                <input id="new-pass-1" placeholder="Create Password" type="password" @bind="newPassword" />
-                <input id="new-pass-2" placeholder="Re-Enter Password" type="password" @bind="confirmPassword" />
+                <input id="new-pass-1" placeholder="Create Password" type="password" @bind="newPassword1" />
+                <input id="new-pass-2" placeholder="Re-Enter Password" type="password" @bind="newPassword2" />
                 <p>Password must include CAPITAL LETTERS, Symbols, and Numbers.</p>
 
-                <input type="button" value="Create Password" @onclick="HandleCreatePassword" style="margin: 30px 0;" />
-                <input type="button" value="Dev: Skip to Main Dashboard" style="margin-top:10px; color:red;" @onclick="SkipToDashboard" />
+                <input type="button" value="Create Password" style="margin: 30px 0;" @onclick="CreatePasswordAsync" />
+
+                @if (!string.IsNullOrEmpty(feedbackMessage))
+                {
+                    <p class="@feedbackClass" style="margin-top:10px;">0.0.0.0 says: @feedbackMessage</p>
+                }
+
+                <input type="button" value="Dev: Skip to Main Dashboard" style="margin-top:10px; color:red;" @onclick="@(() => Navigation.NavigateTo("/dashboard"))" />
             </div>
 
         </div>
@@ -86,170 +98,149 @@
 </div>
 
 @code {
-    private string email = string.Empty;
-    private string password = string.Empty;
-    private string verificationCode = string.Empty;
-    private string newPassword = string.Empty;
-    private string confirmPassword = string.Empty;
-    private string currentUserId = string.Empty;
-    private string generatedCode = string.Empty;
+    private string email = "";
+    private string password = "";
+    private string verificationCode = "";
+    private string newPassword1 = "";
+    private string newPassword2 = "";
 
-    private bool showPrompt1 = true;
-    private bool showPrompt2 = false;
-    private bool showPrompt3 = false;
+    private string feedbackMessage = "";
+    private string feedbackClass = "";
 
-    private async Task ShowPasswordInstructions() =>
-        await JSRuntime.InvokeVoidAsync("showPasswordInstructions");
-
-    private async Task HidePasswordInstructions() =>
-        await JSRuntime.InvokeVoidAsync("hidePasswordInstructions");
-
-    private async Task HandleLogin()
+    // Step 1: Login
+    private async Task LoginAsync()
     {
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        feedbackMessage = "";
+
+        if (string.IsNullOrWhiteSpace(email))
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Please fill in both fields.");
+            ShowFeedback("Please input an email.", false);
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            ShowFeedback("Please input a password.", false);
             return;
         }
 
         try
         {
-            var userCredential = await firebaseAuthService.SignInWithEmailPassword(email, password);
-            if (userCredential != null)
+            var result = await firebaseAuthService.LoginAsync(email, password);
+
+            if (result.IsSuccess)
             {
-                currentUserId = userCredential.LocalId; // Use LocalId here, since FirebaseLoginResponse doesn't have a User property.
+                var isNewUser = await fireStoreService.IsFirstTimeUserAsync(email);
 
-                showPrompt1 = false;
-                showPrompt2 = true;
-
-                await SendVerificationEmail();
+                if (isNewUser)
+                {
+                    ShowFeedback("Login successful. Proceeding to verification...", true);
+                    ShowStep(2);
+                    await emailService.SendVerificationCodeAsync(email);
+                    ShowFeedback("Verification code sent to your email.", true);
+                }
+                else
+                {
+                    ShowFeedback("Login successful. Redirecting to dashboard...", true);
+                    Navigation.NavigateTo("/home");
+                }
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("alert", "Login failed.");
+                ShowFeedback(result.ErrorMessage ?? "Incorrect email or password.", false);
             }
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Login failed: {ex.Message}");
+            ShowFeedback($"Login failed: {ex.Message}", false);
         }
     }
 
-
-    private async Task SendVerificationEmail()
+    private void ShowStep(int step)
     {
-        generatedCode = new Random().Next(100000, 999999).ToString();
-        var sent = await emailService.SendVerificationCodeAsync(email, "User", generatedCode);
-
-        if (sent)
-            await JSRuntime.InvokeVoidAsync("alert", "Verification code sent to your email.");
-        else
-            await JSRuntime.InvokeVoidAsync("alert", "Failed to send code.");
+        JSRuntime.InvokeVoidAsync("eval", $@"
+            document.querySelectorAll('.prompt-1, .prompt-2, .prompt-3').forEach(el => el.style.display = 'none');
+            document.querySelector('.prompt-{step}').style.display = 'block';
+        ");
+        feedbackMessage = "";
+        StateHasChanged();
     }
 
-    private async Task HandleVerificationSubmit()
+    // Step 2: Verify Code
+    private async Task VerifyCodeAsync()
     {
-        if (!IsSixDigitCode(verificationCode))
+        if (string.IsNullOrWhiteSpace(verificationCode))
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Code must be exactly 6 digits.");
+            ShowFeedback("Verification code cannot be empty.", false);
             return;
         }
 
-        if (verificationCode != generatedCode)
+        if (verificationCode.Length != 6)
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Invalid code.");
-            return;
-        }
-
-        showPrompt2 = false;
-        showPrompt3 = true;
-    }
-
-    private async Task HandleCreatePassword()
-    {
-        if (newPassword != confirmPassword)
-        {
-            await JSRuntime.InvokeVoidAsync("alert", "Passwords do not match.");
-            return;
-        }
-
-        if (!IsValidPassword(newPassword))
-        {
-            await JSRuntime.InvokeVoidAsync("alert", "Include uppercase, numbers, and symbols.");
-            return;
-        }
-
-        if (string.IsNullOrEmpty(currentUserId))
-        {
-            await JSRuntime.InvokeVoidAsync("alert", "User not found.");
+            ShowFeedback("Please enter the 6-digit verification code.", false);
             return;
         }
 
         try
         {
-            // Assuming you're using Firebase Firestore SDK, make sure to initialize Firestore correctly
-            var firestoreDb = FirestoreDb.Create("your_project_id");
-            var userDocRef = firestoreDb.Collection("users").Document(currentUserId);
-            var updateData = new Dictionary<string, object>
+            var isValid = await emailService.VerifyCodeAsync(email, verificationCode);
+
+            if (isValid)
+            {
+                ShowFeedback("Code submitted successfully.", true);
+                ShowStep(3);
+            }
+            else
+            {
+                ShowFeedback("Invalid verification code. Please try again.", false);
+            }
+        }
+        catch (Exception ex)
         {
-            { "permanent_password", newPassword },
-            { "has_permanent_password", true }
-        };
+            ShowFeedback($"Verification failed: {ex.Message}", false);
+        }
+    }
 
-            await userDocRef.UpdateAsync(updateData);
-            await JSRuntime.InvokeVoidAsync("alert", "Password updated!");
+    // Step 3: Create New Password
+    private async Task CreatePasswordAsync()
+    {
+        if (newPassword1 != newPassword2)
+        {
+            ShowFeedback("Passwords do not match.", false);
+            return;
+        }
 
+        if (!IsValidPassword(newPassword1))
+        {
+            ShowFeedback("Password must include CAPITAL LETTERS, symbols, and numbers.", false);
+            return;
+        }
+
+        try
+        {
+            await firebaseAuthService.UpdatePasswordAsync(email, newPassword1);
+            await fireStoreService.MarkUserAsNotFirstTimeAsync(email);
+
+            ShowFeedback("Password created successfully. Redirecting...", true);
             Navigation.NavigateTo("/home");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Firestore Error: {ex.Message}");
-            await JSRuntime.InvokeVoidAsync("alert", "Error saving password.");
+            ShowFeedback($"Password reset failed: {ex.Message}", false);
         }
     }
 
-
-    private void ValidateKeypress(KeyboardEventArgs e)
+    private bool IsValidPassword(string password)
     {
-        if (e.Key.Length == 1 && !char.IsDigit(e.Key[0]))
-        {
-            JSRuntime.InvokeVoidAsync("alert", "Only digits allowed.");
-        }
+        return password.Any(char.IsUpper) && password.Any(char.IsDigit) && password.Any(ch => !char.IsLetterOrDigit(ch));
     }
 
-    private bool IsSixDigitCode(string code) =>
-        code.Length == 6 && code.All(char.IsDigit);
-
-    private bool IsValidPassword(string pass) =>
-        pass.Any(char.IsUpper) && pass.Any(char.IsDigit) && pass.Any(c => !char.IsLetterOrDigit(c));
-
-    private void ReturnToPrompt1()
+    private void ShowFeedback(string message, bool isSuccess)
     {
-        showPrompt1 = true;
-        showPrompt2 = false;
+        feedbackMessage = message;
+        feedbackClass = isSuccess ? "success-message" : "error-message";
     }
-
-    private void ReturnToPrompt2()
-    {
-        showPrompt2 = true;
-        showPrompt3 = false;
-    }
-
-    private void SkipToPrompt2()
-    {
-        showPrompt1 = false;
-        showPrompt2 = true;
-    }
-
-    private void SkipToPrompt3()
-    {
-        showPrompt2 = false;
-        showPrompt3 = true;
-    }
-
-    private void SkipToDashboard() =>
-        Navigation.NavigateTo("/home");
 }
+
 
 <script>
     window.showPasswordInstructions = () => {

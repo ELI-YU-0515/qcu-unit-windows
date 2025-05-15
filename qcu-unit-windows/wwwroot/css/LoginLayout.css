@@ -240,6 +240,13 @@
         flex-direction: column;
     }
 
+    .success-message {
+        color: green;
+    }
+
+    .error-message {
+        color: red;
+    }
 
 }
 

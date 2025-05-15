@@ -1,59 +1,56 @@
-﻿using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Firestore;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public class FirestoreService
 {
-    private readonly HttpClient _httpClient = new();
-    private readonly string _projectId = "your-project-id"; // Your project ID
+    private FirestoreDb _firestore;
 
-    public async Task<bool> UpdateUserPasswordAsync(string uid, string idToken, string newPassword)
+    public FirestoreService()
     {
-        try
+        // Path to your service account JSON key
+        string pathToJson = "";
+
+        // Load the credential from the JSON key file
+        GoogleCredential credential = GoogleCredential.FromFile(pathToJson);
+
+        // Create Firestore client with the credential
+        _firestore = new FirestoreDbBuilder
         {
-            // Firestore document path for the user
-            var docPath = $"projects/{_projectId}/databases/(default)/documents/users/{uid}";
+            ProjectId = "qcu-repo-dbf94",
+            Credential = credential
+        }.Build();
+    }
 
-            // Define the patch data with fields to update
-            var patchData = new
-            {
-                fields = new Dictionary<string, object>
-                {
-                    { "permanent_password", new { stringValue = newPassword } },
-                    { "has_permanent_password", new { booleanValue = true } }
-                }
-            };
 
-            // Create the HTTP request for patching the document
-            var request = new HttpRequestMessage(HttpMethod.Patch, $"https://firestore.googleapis.com/v1/{docPath}")
-            {
-                Content = JsonContent.Create(patchData)
-            };
+    // Checks if user is first time by checking 'hasResetPassword' flag (false means first time)
+    public async Task<bool> IsFirstTimeUserAsync(string userId)
+    {
+        var docRef = _firestore.Collection("students").Document(userId);
+        var snapshot = await docRef.GetSnapshotAsync();
 
-            // Set the authorization token (ID token)
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", idToken);
-
-            // Send the request
-            var response = await _httpClient.SendAsync(request);
-
-            // Check the response status
-            if (response.IsSuccessStatusCode)
-            {
-                Console.WriteLine("Password updated successfully via REST.");
-                return true;
-            }
-
-            // Handle failure case
-            Console.WriteLine($"Failed to update password: {await response.Content.ReadAsStringAsync()}");
-            return false;
-        }
-        catch (Exception ex)
+        if (snapshot.Exists && snapshot.ContainsField("hasResetPassword"))
         {
-            // Catch exceptions and log error
-            Console.WriteLine($"Exception updating Firestore: {ex.Message}");
-            return false;
+            bool hasReset = snapshot.GetValue<bool>("hasResetPassword");
+            return !hasReset; // Return true if NOT reset yet
         }
+
+        // If no doc or field, treat as first time user
+        return true;
+    }
+
+    // Mark user as not first time (password reset done)
+    public async Task MarkUserAsNotFirstTimeAsync(string userId)
+    {
+        var docRef = _firestore.Collection("students").Document(userId);
+        Dictionary<string, object> updates = new()
+        {
+            { "hasResetPassword", true }
+        };
+
+        // Use SetAsync with MergeAll to avoid failure if doc does not exist yet
+        await docRef.SetAsync(updates, SetOptions.MergeAll);
     }
 }

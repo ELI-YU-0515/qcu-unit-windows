@@ -29,7 +29,6 @@
     <div class="title-box">
         <h1 class="txt1 featured-title2">My Systems</h1>
         <div class="button-group2">
-            <input class="back-button" type="button" value="Back" @onclick="home" />
             <input class="upload-button" type="button" value="Upload" @onclick="OpenPopupForNew" />
         </div>
     </div>
@@ -43,20 +42,23 @@
                 <div class="general-box">
                     @if (!string.IsNullOrEmpty(system.ImageUrl))
                     {
-                        <img src="@system.ImageUrl" alt="System Image" style="max-width: 200px; max-height: 200px; border: 1px solid #ccc;" />
+                        <img src="@system.ImageUrl" alt="System Image" style="max-width: 150px; max-height: 150px; border: 1px solid #000000; border-radius:4px; margin-left: 10px;" />
                     }
-                    <p><strong>Title</strong> @system.Title</p>
-                    <p><strong>Description</strong> @system.Description</p>
-                    <p><strong>Instructions</strong> @system.Instructions</p>
-                    <p><strong>Zip File</strong> @system.ZipFileName</p>
-                    <div style="margin-top: 10px;">
-                        <button class="remove-button" @onclick="@(() => DeleteUploadedSystem(system))">Delete</button>
+                    <p><strong>Title: </strong> @system.Title</p>
+                    <p><strong>Description: </strong> @system.Description</p>
+                    <p><strong>Instructions: </strong> @system.Instructions</p>
+                    <p><strong>File: </strong> @system.ZipFileName</p>
+                    <div class="dual-button" style="margin-top: 5px;">
                         <button class="edit-button" @onclick="@(() => OpenPopupForEdit(system))">Edit</button>
+                        <button class="remove-button" @onclick="@(() => DeleteUploadedSystem(system))">Delete</button>
                     </div>
                 </div>
+                    
             }
         </div>
     </div>
+    <input class="dashboard-button" type="button" value="Back to Dashboard" @onclick="home" />
+
 </div>
 
 @if (showPopup)

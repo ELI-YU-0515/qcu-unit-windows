@@ -35,7 +35,7 @@
 
                 @if (!string.IsNullOrEmpty(feedbackMessage))
                 {
-                    <p class="@feedbackClass" style="margin-top:10px;">0.0.0.0 says: @feedbackMessage</p>
+                    <p class="@feedbackClass" style="margin-top:5px; color:green;">QCU Repo says: @feedbackMessage</p>
                 }
 
                 <div id="password-instructions" class="password-instructions" style="display:none;">
@@ -56,42 +56,19 @@
                 <br /><br /><br />
 
                 <h2>First Time Logging In?</h2>
-                <p>We’ve sent a 6-digit code to your email.</p>
+                <p>We’ve sent a 6-digit code to your email. Please Check your SPAM emails</p>
 
                 <input id="temp-code" placeholder="Enter 6-Digit Code" maxlength="6" inputmode="numeric" pattern="\d*" autocomplete="new-password" spellcheck="false" @bind="verificationCode" />
                 <input type="button" value="Submit" @onclick="VerifyCodeAsync" />
 
                 @if (!string.IsNullOrEmpty(feedbackMessage))
                 {
-                    <p class="@feedbackClass" style="margin-top:10px;">0.0.0.0 says: @feedbackMessage</p>
+                    <p class="@feedbackClass" style="margin-top:5px; color:green;">QCU Repo says: @feedbackMessage</p>
                 }
 
-                <input type="button" value="Dev: Skip to Create Password" style="margin-top:10px; color:red;" @onclick="@(() => ShowStep(3))" />
+                <input type="button" value="Dev: Skip to Dashboard" style="margin-top:10px; color:red;" @onclick="@(() => Navigation.NavigateTo("/home"))">
             </div>
 
-            <!-- Step 3: Create Password -->
-            <div class="prompt-3" style="display:none;">
-                <svg @onclick="@(() => ShowStep(2))" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-button">
-                    <path d="M19 12H5"></path>
-                    <path d="M12 5l-7 7 7 7"></path>
-                </svg>
-                <br /><br /><br />
-
-                <h2>Change Password</h2>
-                <p>Create a new password for QCUREPO:</p>
-                <input id="new-pass-1" placeholder="Create Password" type="password" @bind="newPassword1" />
-                <input id="new-pass-2" placeholder="Re-Enter Password" type="password" @bind="newPassword2" />
-                <p>Password must include CAPITAL LETTERS, Symbols, and Numbers.</p>
-
-                <input type="button" value="Create Password" style="margin: 30px 0;" @onclick="CreatePasswordAsync" />
-
-                @if (!string.IsNullOrEmpty(feedbackMessage))
-                {
-                    <p class="@feedbackClass" style="margin-top:10px;">0.0.0.0 says: @feedbackMessage</p>
-                }
-
-                <input type="button" value="Dev: Skip to Main Dashboard" style="margin-top:10px; color:red;" @onclick="@(() => Navigation.NavigateTo("/dashboard"))" />
-            </div>
 
         </div>
     </div>
@@ -106,6 +83,8 @@
 
     private string feedbackMessage = "";
     private string feedbackClass = "";
+
+
 
     // Step 1: Login
     private async Task LoginAsync()
@@ -186,8 +165,26 @@
 
             if (isValid)
             {
-                ShowFeedback("Code submitted successfully.", true);
-                ShowStep(3);
+                ShowFeedback("Code verified. Sending password reset link...", true);
+
+                var result = await firebaseAuthService.SendPasswordResetEmailAsync(email);
+
+                if (result == "Success")
+                {
+                    await fireStoreService.MarkUserAsNotFirstTimeAsync(email); // ✅ Mark after reset link sent
+                    ShowFeedback("Password reset link sent to your email. Please check your inbox.", true);
+                    await Task.Delay(5000);
+                    ShowStep(1); // Or whichever prompt you want to go back to
+
+
+                    email = "";
+                    password = "";
+                }
+
+                else
+                {
+                    ShowFeedback($"Failed to send password reset link: {result}", false);
+                }
             }
             else
             {
@@ -199,6 +196,7 @@
             ShowFeedback($"Verification failed: {ex.Message}", false);
         }
     }
+
 
     // Step 3: Create New Password
     private async Task CreatePasswordAsync()

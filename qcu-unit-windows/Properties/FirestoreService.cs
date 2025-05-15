@@ -34,23 +34,24 @@ public class FirestoreService
         if (snapshot.Exists && snapshot.ContainsField("hasResetPassword"))
         {
             bool hasReset = snapshot.GetValue<bool>("hasResetPassword");
-            return !hasReset; // Return true if NOT reset yet
+            return !hasReset; // true if first-time
         }
 
-        // If no doc or field, treat as first time user
+        // No field or no doc = treat as first-time
         return true;
     }
+
 
     // Mark user as not first time (password reset done)
     public async Task MarkUserAsNotFirstTimeAsync(string userId)
     {
         var docRef = _firestore.Collection("students").Document(userId);
         Dictionary<string, object> updates = new()
-        {
-            { "hasResetPassword", true }
-        };
+    {
+        { "hasResetPassword", true }
+    };
 
-        // Use SetAsync with MergeAll to avoid failure if doc does not exist yet
         await docRef.SetAsync(updates, SetOptions.MergeAll);
     }
+
 }

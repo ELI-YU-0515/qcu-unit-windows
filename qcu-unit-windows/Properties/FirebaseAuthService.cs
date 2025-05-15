@@ -84,7 +84,7 @@ public class FirebaseAuthService
         return currentIdToken;
     }
 
-    public async Task<bool> SendPasswordResetEmailAsync(string email)
+    public async Task<string> SendPasswordResetEmailAsync(string email)
     {
         var request = new
         {
@@ -97,8 +97,12 @@ public class FirebaseAuthService
             request
         );
 
-        return response.IsSuccessStatusCode;
+        var responseBody = await response.Content.ReadAsStringAsync();
+        return response.IsSuccessStatusCode
+            ? "Success"
+            : $"Error: {responseBody}";
     }
+
 
     public async Task LogoutAsync()
     {

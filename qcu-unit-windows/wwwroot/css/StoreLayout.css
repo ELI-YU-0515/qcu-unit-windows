@@ -320,8 +320,7 @@
     font-weight: bold;
 }
 .remove-button, .edit-button {
-    margin-right: 20px;
-    margin-bottom: 10px;
+    margin:5px 0 5px 0;
     padding: 4px 8px;
     border: none;
     color: white;
@@ -330,12 +329,13 @@
 }
 
 .remove-button {
+    width: 5rem;
     background-color: crimson;
 }
 
 .edit-button {
     background-color: steelblue;
-    margin-left: 5px;
+    width: 5rem;
     background-color: #4CAF50;
     padding: 5px 10px;
     border: none;
@@ -384,21 +384,8 @@
     text-align: left;
     padding: 10px;
 }
-.general-grid{
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* spacing between boxes */
-    padding: 10px;
-}
-.general-box  {
-    margin: 0px 20px 0px 20px;
-    color: #062454;
-    justify-content:left ;
-    
-}
-.general-box p{
-    margin-left: 20px;
-}
+
 .dual-button {
+    margin:0;
     float: right;
 }

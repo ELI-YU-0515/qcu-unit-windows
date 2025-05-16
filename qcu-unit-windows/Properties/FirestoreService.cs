@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 public class FirestoreService
 {
-    private FirestoreDb _firestore;
+    public FirestoreDb _firestore;
 
     public FirestoreService()
     {

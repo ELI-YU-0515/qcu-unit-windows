@@ -1,0 +1,150 @@
+﻿@page "/register"
+@using qcu_unit_windows.Components.Layout
+@layout RegisterLayout
+
+@inject FirebaseAuthService firebaseAuthService
+@inject NavigationManager Navigation
+
+<div class="home-layout">
+    <button class="toggle-sidebar-button @(sidebarClass == "open" ? "open" : "")" @onclick="ToggleSidebar">☰</button>
+
+    <div class="sidebar-overlay @(sidebarClass == "open" ? "visible" : "")" @onclick="ToggleSidebar"></div>
+
+    <div class="home-sidebar @(sidebarClass)">
+        <h1 class="txt1-headline">QCU Repo</h1>
+        <button class="my-systems-button" @onclick="MySystems">My Systems</button>
+        <button class="my-systems-button" @onclick="adminRegister">Add Users</button>
+        <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
+    </div>
+
+    <div class="home-layout2">
+        <h1 class="featured-title">Create a New Account</h1>
+
+        <input placeholder="Email" type="email" @bind="email" class="form-input" />
+        <input placeholder="Password" type="password" @bind="password" class="form-input" />
+        <input placeholder="Confirm Password" type="password" @bind="confirmPassword" class="form-input" />
+
+        <input type="button" value="Register" @onclick="RegisterAsync" class="nav-button" />
+
+        @if (!string.IsNullOrEmpty(feedbackMessage))
+        {
+            <p class="@feedbackClass">@feedbackMessage</p>
+        }
+    </div>
+</div>
+
+
+@code {
+    private string email = "";
+    private string password = "";
+    private string confirmPassword = "";
+    private string feedbackMessage = "";
+    private string feedbackClass = "";
+    private string sidebarClass = "closed";
+    private string sidebarButtonClass = "";
+
+
+    private void qcuUnitLogin() => Navigation.NavigateTo("/login");
+    private void qcuUnitStore() => Navigation.NavigateTo("/Store");
+    private void MySystems() => Navigation.NavigateTo("/mysystem");
+    private void adminRegister() => Navigation.NavigateTo("/register");
+
+    private void ToggleSidebar()
+    {
+        sidebarClass = sidebarClass == "closed" ? "open" : "closed";
+        sidebarButtonClass = sidebarClass == "open" ? "open" : "";
+    }
+
+    private async Task RegisterAsync()
+    {
+        feedbackMessage = "";
+
+        // Basic input validation
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            ShowFeedback("Please enter an email address.", false);
+            return;
+        }
+
+
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            ShowFeedback("Please enter a password.", false);
+            return;
+        }
+
+        if (password != confirmPassword)
+        {
+            ShowFeedback("Passwords do not match.", false);
+            return;
+        }
+
+        if (!IsValidPassword(password))
+        {
+            ShowFeedback("Password must include CAPITAL LETTERS, symbols, and numbers.", false);
+            return;
+        }
+
+        try
+        {
+            var result = await firebaseAuthService.RegisterUserAsync(email, password);
+
+            if (result.IsSuccess)
+            {
+                ShowFeedback("Registration successful! Redirecting to login...", true);
+                await Task.Delay(2000);
+                Navigation.NavigateTo("/login");
+            }
+            else
+            {
+                ShowFeedback($"Registration failed: {result.ErrorMessage}", false);
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowFeedback($"Unexpected error: {ex.Message}", false);
+        }
+    }
+
+    private bool IsValidPassword(string password)
+    {
+        return password.Any(char.IsUpper) &&
+               password.Any(char.IsDigit) &&
+               password.Any(ch => !char.IsLetterOrDigit(ch));
+    }
+
+
+
+    private async Task<bool> IsFirebaseEmailValidAsync(string email, string password)
+    {
+        try
+        {
+            var result = await firebaseAuthService.LoginAsync(email, password);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("INVALID_EMAIL"))
+            {
+                Console.WriteLine("Invalid email format.");
+                return false;
+            }
+            else if (ex.Message.Contains("EMAIL_NOT_FOUND"))
+            {
+                Console.WriteLine("Email not found. Consider signing up.");
+                return true;
+            }
+            else
+            {
+                Console.WriteLine($"Firebase Error: {ex.Message}");
+                return false;
+            }
+        }
+    }
+
+    private void ShowFeedback(string message, bool isSuccess)
+    {
+        feedbackMessage = message;
+        feedbackClass = isSuccess ? "success-message" : "error-message";
+    }
+}

@@ -1,8 +1,15 @@
 ﻿@page "/home"
 @using qcu_unit_windows.Components.Layout
+@using Google.Cloud.Firestore;
+@using Google.Apis.Auth.OAuth2;
+@using qcu_unit_windows.Properties
+
+
 @layout DashboardLayout
 @inject NavigationManager Navigation
+@inject FirebaseAuthService firebaseAuthService
 @implements IDisposable
+
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -19,14 +26,15 @@
     <button class="nav-settings" @onclick="ToggleSidebar">Settings</button>
 </div>
 
-<div class="home-layout">         
+<div class="home-layout">
     <div class="sidebar-overlay @(sidebarClass == "open" ? "visible" : "")" @onclick="ToggleSidebar"></div>
     <div class="home-sidebar @sidebarClass">
         <h1 class="txt1-headline">QCU Repo</h1>
         <button class="my-systems-button" @onclick="MySystems">My Systems</button>
+        <button class="my-systems-button" @onclick="adminRegister">Add Users</button>
+
         <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
     </div>
-
     <div class="home-layout2">
             <section class="search-section @(isScrolled ? "expanded" : "")">
                 <div class="search-bar">
@@ -68,8 +76,8 @@
             }
         </div>
     </div>
-
 </div>
+
 <div class="explore-banner">
     <div class="explore-divider"></div>
     <h1 class="explore-title">Explore</h1>
@@ -104,13 +112,30 @@
 </div>
 
 <div class="general-grid">
-    @for (int i = 1; i <= 20; i++) // 4x5 = 20 items
+    @foreach (var system in uploadedSystems)
     {
-        <div class="general-box" @onclick="() => OnGeneralItemClick(i)">
-            <p>Item @i</p>
+        <div class="general-box">
+            @if (!string.IsNullOrEmpty(system.ImageUrl))
+            {
+                <img src="@system.ImageUrl" alt="System Image" style="max-width: 150px; max-height: 150px; border: 1px solid #000000; border-radius:4px; margin-left: 10px;" />
+            }
+            <p><strong>Title: </strong> @system.Title</p>
+            <p><strong>Description: </strong> @system.Description</p>
+            <p><strong>Instructions: </strong> @system.Instructions</p>
+            <p><strong>File: </strong> @system.ZipFileName</p>
+
+            <div class="dual-button">
+                <button class="download-button" @onclick="() => DownloadFile(system.ZipFileName)">
+                    <i class="fa fa-download"></i> Download
+                </button>
+            </div>
         </div>
     }
 </div>
+
+
+
+
 
 <!-- MOBILE NAVBAR -->
 
@@ -120,8 +145,69 @@
 @code {
     private string sidebarClass = "closed";
     private string sidebarButtonClass = "";
+    private List<UploadedSystem> uploadedSystems = new();
     private bool isScrolled = false;
     private DotNetObjectReference<Home>? _dotNetRef;
+
+        public FirestoreDb _firestore;
+
+        public Home()
+        {
+            // Path to your service account JSON key
+            string pathToJson = "";
+
+            // Load the credential from the JSON key file
+            GoogleCredential credential = GoogleCredential.FromFile(pathToJson);
+
+            // Create Firestore client with the credential
+            _firestore = new FirestoreDbBuilder
+                {
+                    ProjectId = "qcu-repo-dbf94",
+                    Credential = credential
+                }.Build();
+        }
+
+
+    private async Task LoadUploadedSystemsAsync()
+    {
+        uploadedSystems.Clear();
+
+        try
+        {
+            var systemsGroupQuery = _firestore.CollectionGroup("systems");
+            var snapshot = await systemsGroupQuery.GetSnapshotAsync();
+
+            foreach (var doc in snapshot.Documents)
+            {
+                if (doc.Exists)
+                {
+                    var data = doc.ToDictionary();
+
+                    uploadedSystems.Add(new UploadedSystem
+                    {
+                        Title = data.ContainsKey("title") ? data["title"]?.ToString() ?? "" : "",
+                        Description = data.ContainsKey("description") ? data["description"]?.ToString() : null,
+                        Instructions = data.ContainsKey("instructions") ? data["instructions"]?.ToString() : null,
+                        ZipFileName = data.ContainsKey("zipFileName") ? data["zipFileName"]?.ToString() ?? "" : "",
+                        ImageUrl = data.ContainsKey("imageUrl") ? data["imageUrl"]?.ToString() : null
+                    });
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading systems: {ex.Message}");
+        }
+
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        systems = await GetAllSystemsAsync();
+        await LoadUploadedSystemsAsync(); // <-- Load uploaded systems
+    }
+
 
     [JSInvokable]
     public void OnScrollChanged(double scrollTop)
@@ -155,6 +241,8 @@
     private void qcuUnitLogin() => Navigation.NavigateTo("/login");
     private void qcuUnitStore() => Navigation.NavigateTo("/Store");
     private void MySystems() => Navigation.NavigateTo("/mysystem");
+    private void adminRegister() => Navigation.NavigateTo("/register");
+
     private void PreviousItem()
     {
         currentItemIndex = (currentItemIndex - 1 + items.Count) % items.Count;
@@ -169,6 +257,31 @@
         // Future logic goes here
     }           
 
+    public async Task<List<string>> GetAllSystemsAsync()
+    {
+        var systems = new List<string>();
+
+        // Get all documents in 'students' collection
+        var studentsSnapshot = await _firestore.Collection("students").GetSnapshotAsync();
+
+        foreach (var studentDoc in studentsSnapshot.Documents)
+        {
+            // Access the subcollection "systems" of each student
+            var systemsRef = studentDoc.Reference.Collection("systems");
+            var systemsSnapshot = await systemsRef.GetSnapshotAsync();
+
+            foreach (var doc in systemsSnapshot.Documents)
+            {
+                if (doc.TryGetValue("name", out string name))
+                {
+                    systems.Add(name);
+                }
+            }
+        }
+
+        return systems;
+    }
+
     private List<string> systems = new()
     {
         "System A", "System B", "System C", "System D", "System E",
@@ -179,6 +292,12 @@
     {
         // Handle click (redirect, open modal, etc.)
         Console.WriteLine($"Clicked: {systemName}");
+    }
+    private void DownloadFile(string zipFileName)
+    {
+        // Your download logic here
+        Console.WriteLine($"Download clicked for: {zipFileName}");
+        // e.g., open URL or trigger download from server
     }
 
 

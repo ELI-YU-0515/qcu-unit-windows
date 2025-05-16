@@ -2,8 +2,13 @@
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Forms
 @using qcu_unit_windows.Components.Layout
+@using Google.Cloud.Firestore;
+@using Google.Apis.Auth.OAuth2;
+
 @layout DashboardLayout
 @inject NavigationManager Navigation
+@inject FirebaseAuthService firebaseAuthService
+
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -48,7 +53,7 @@
                     <p><strong>Description: </strong> @system.Description</p>
                     <p><strong>Instructions: </strong> @system.Instructions</p>
                     <p><strong>File: </strong> @system.ZipFileName</p>
-                    <div class="dual-button" style="margin-top: 5px;">
+                    <div class="dual-button">
                         <button class="edit-button" @onclick="@(() => OpenPopupForEdit(system))">Edit</button>
                         <button class="remove-button" @onclick="@(() => DeleteUploadedSystem(system))">Delete</button>
                     </div>
@@ -85,7 +90,7 @@
                 }
 
                 <div style="text-align: right;">
-                    <button class="save-button" @onclick="SaveSystem">Save</button>
+                    <button class="save-button" @onclick="SaveSystemToFirestoreAsync">Save</button>
                     <button class="return-button" @onclick="ClosePopup">Cancel</button>
                 </div>
             </div>
@@ -124,6 +129,13 @@
                     <p class="validation-error">Description is required.</p>
                 }
 
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger" style="color: red;">
+                        @errorMessage
+                    </div>
+                }
+
                 <label class="field-label">Instructions (Optional)</label><br />
                 <textarea class="instruction-text-field" @bind="instruction" rows="3" cols="40" placeholder="Add Instructions (Optional)"></textarea>
             </div>
@@ -136,7 +148,7 @@
 
 @code {
     private List<UploadedSystem> uploadedSystems = new();
-
+    private string? errorMessage;
     private string? imagePreviewUrl;
     private string? title;
     private string? description;
@@ -148,6 +160,31 @@
     private bool showValidation = false;
     private bool isEditMode = false;
     private UploadedSystem? editingSystem = null;
+
+        public FirestoreDb _firestore;
+
+        public System()
+        {
+            // Path to your service account JSON key
+            string pathToJson = "";
+
+            // Load the credential from the JSON key file
+            GoogleCredential credential = GoogleCredential.FromFile(pathToJson);
+
+            // Create Firestore client with the credential
+            _firestore = new FirestoreDbBuilder
+                {
+                    ProjectId = "qcu-repo-dbf94",
+                    Credential = credential
+                }.Build();
+        }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUploadedSystemsAsync();
+    }
+
+
 
     private void OpenPopupForNew()
     {
@@ -188,35 +225,100 @@
 
     private async Task HandleFileSelectedAsync(InputFileChangeEventArgs e)
     {
-        var file = e.File;
-        if (file != null && file.Name.EndsWith(".zip"))
+        errorMessage = null;
+        try
         {
+            var file = e.File;
+            if (file == null)
+            {
+                errorMessage = "No file selected.";
+                return;
+            }
+
+            if (!file.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+            {
+                errorMessage = "Selected file is not a .zip file.";
+                return;
+            }
+
+            const long maxFileSize = 20 * 1024 * 1024;
+            if (file.Size > maxFileSize)
+            {
+                errorMessage = "Selected file exceeds maximum allowed size of 20MB.";
+                return;
+            }
+
             tempZipFileName = file.Name;
-            using var stream = file.OpenReadStream(20 * 1024 * 1024);
+
+            using var stream = file.OpenReadStream(maxFileSize);
             using var ms = new MemoryStream();
-            await stream.CopyToAsync(ms);
+
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30)); // 30s timeout
+            await stream.CopyToAsync(ms, 81920, cts.Token);
+
             tempZipBytes = ms.ToArray();
+        }
+        catch (OperationCanceledException)
+        {
+            errorMessage = "File upload timed out. Please try a smaller file or check your connection.";
+            Console.WriteLine(errorMessage);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error in HandleFileSelectedAsync: {ex}";
+            Console.WriteLine(errorMessage);
+        }
+    }
+    private async Task ImageSelectedAsync(InputFileChangeEventArgs e)
+    {
+        errorMessage = null;
+        try
+        {
+            var file = e.File;
+            if (file == null)
+            {
+                errorMessage = "No image file selected.";
+                return;
+            }
+
+            const long maxImageSize = 10 * 1024 * 1024; // 10MB
+            if (file.Size > maxImageSize)
+            {
+                errorMessage = "Selected image file exceeds maximum allowed size of 10MB.";
+                return;
+            }
+
+            using var stream = file.OpenReadStream(maxImageSize);
+            using var ms = new MemoryStream();
+
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30)); // 30 seconds timeout
+            await stream.CopyToAsync(ms, 81920, cts.Token);
+
+            var base64 = Convert.ToBase64String(ms.ToArray());
+            imagePreviewUrl = $"data:{file.ContentType};base64,{base64}";
+        }
+        catch (OperationCanceledException)
+        {
+            errorMessage = "Image upload timed out. Please try a smaller image or check your connection.";
+            Console.WriteLine(errorMessage);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error in ImageSelectedAsync: {ex}";
+            Console.WriteLine(errorMessage);
         }
     }
 
-    private async Task ImageSelectedAsync(InputFileChangeEventArgs e)
-    {
-        var file = e.File;
-        if (file != null)
-        {
-            using var stream = file.OpenReadStream(10 * 1024 * 1024);
-            using var ms = new MemoryStream();
-            await stream.CopyToAsync(ms);
-            imagePreviewUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(ms.ToArray())}";
-        }
-    }
 
     private void RemoveImage()
     {
         imagePreviewUrl = null;
     }
 
-    private void SaveSystem()
+
+
+
+    private async Task SaveSystemToFirestoreAsync()
     {
         showValidation = true;
 
@@ -226,30 +328,87 @@
             !string.IsNullOrWhiteSpace(tempZipFileName) &&
             !string.IsNullOrWhiteSpace(imagePreviewUrl);
 
-        if (isValid)
+        if (!isValid)
         {
-            if (isEditMode && editingSystem != null)
-            {
-                editingSystem.Title = title!;
-                editingSystem.Description = description;
-                editingSystem.Instructions = instruction;
-                editingSystem.ZipFileName = tempZipFileName!;
-                editingSystem.ImageUrl = imagePreviewUrl;
-            }
-            else
-            {
-                uploadedSystems.Add(new UploadedSystem
-                    {
-                        Title = title!,
-                        Description = description,
-                        Instructions = instruction,
-                        ZipFileName = tempZipFileName!,
-                        ImageUrl = imagePreviewUrl
-                    });
-            }
+            Console.WriteLine("Validation failed");
+            return;
+        }
 
+        string? currentUserEmail = firebaseAuthService.GetCurrentEmail();
+
+        if (string.IsNullOrEmpty(currentUserEmail))
+        {
+            Console.WriteLine("User is not logged in.");
+            return;
+        }
+
+        try
+        {
+            var userDoc = _firestore.Collection("students").Document(currentUserEmail);
+            var systemsSubcollection = userDoc.Collection("systems");
+
+            var newSystem = new Dictionary<string, object>
+        {
+            { "title", title ?? "" },
+            { "description", description ?? "" },
+            { "instructions", instruction ?? "" },
+            { "imageUrl", imagePreviewUrl ?? "" },
+            { "zipFileName", tempZipFileName ?? "" },
+            { "createdAt", Timestamp.GetCurrentTimestamp() }
+        };
+
+            await systemsSubcollection.AddAsync(newSystem);
+            await LoadUploadedSystemsAsync();
+            Console.WriteLine("Document added successfully.");
             ClosePopup();
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving to Firestore: {ex.Message}");
+        }
+    }
+
+    private async Task LoadUploadedSystemsAsync()
+    {
+        uploadedSystems.Clear();
+
+        string? currentUserEmail = firebaseAuthService.GetCurrentEmail();
+        if (string.IsNullOrEmpty(currentUserEmail))
+        {
+            Console.WriteLine("User is not logged in.");
+            return;
+        }
+
+        try
+        {
+            var userDoc = _firestore.Collection("students").Document(currentUserEmail);
+            var systemsSubcollection = userDoc.Collection("systems");
+
+            var snapshot = await systemsSubcollection.GetSnapshotAsync();
+
+            foreach (var doc in snapshot.Documents)
+            {
+                if (doc.Exists)
+                {
+                    var data = doc.ToDictionary();
+
+                    uploadedSystems.Add(new UploadedSystem
+                        {
+                            Title = data.ContainsKey("title") ? data["title"]?.ToString() ?? "" : "",
+                            Description = data.ContainsKey("description") ? data["description"]?.ToString() : null,
+                            Instructions = data.ContainsKey("instructions") ? data["instructions"]?.ToString() : null,
+                            ZipFileName = data.ContainsKey("zipFileName") ? data["zipFileName"]?.ToString() ?? "" : "",
+                            ImageUrl = data.ContainsKey("imageUrl") ? data["imageUrl"]?.ToString() : null
+                        });
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading systems: {ex.Message}");
+        }
+
+        StateHasChanged(); // Refresh UI
     }
 
     private void DeleteUploadedSystem(UploadedSystem system)

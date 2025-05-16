@@ -18,7 +18,11 @@ public class FirebaseAuthService
     private readonly string apiKey = "AIzaSyDFhJ1SBO3M2AFstZyz50fwXdx57POB3N0";
     private static readonly HttpClient httpClient = new();
 
+    private string? currentEmail;
     private string? currentIdToken;
+
+    public string? GetCurrentEmail() => currentEmail;
+    public string? GetIdToken() => currentIdToken;
 
     public async Task<FirebaseLoginResult> LoginAsync(string email, string password)
     {
@@ -42,6 +46,8 @@ public class FirebaseAuthService
                 var jsonDoc = JsonDocument.Parse(content);
 
                 currentIdToken = jsonDoc.RootElement.GetProperty("idToken").GetString();
+                currentEmail = jsonDoc.RootElement.GetProperty("email").GetString(); // ✅ store email
+                currentEmail = email; // ← Add this line
 
                 return new FirebaseLoginResult
                 {
@@ -52,9 +58,7 @@ public class FirebaseAuthService
             }
             else
             {
-                // Parse error message
                 var errorMessage = "Unknown error";
-
                 try
                 {
                     var jsonDoc = JsonDocument.Parse(content);
@@ -79,11 +83,6 @@ public class FirebaseAuthService
         }
     }
 
-    public string? GetIdToken()
-    {
-        return currentIdToken;
-    }
-
     public async Task<string> SendPasswordResetEmailAsync(string email)
     {
         var request = new
@@ -101,13 +100,6 @@ public class FirebaseAuthService
         return response.IsSuccessStatusCode
             ? "Success"
             : $"Error: {responseBody}";
-    }
-
-
-    public async Task LogoutAsync()
-    {
-        currentIdToken = null;
-        await Task.CompletedTask;
     }
 
     public async Task<bool> UpdatePasswordAsync(string idToken, string newPassword)
@@ -136,4 +128,71 @@ public class FirebaseAuthService
             return false;
         }
     }
+
+    public async Task LogoutAsync()
+    {
+        currentIdToken = null;
+        currentEmail = null; // ✅ reset email on logout
+        await Task.CompletedTask;
+    }
+
+    public async Task<FirebaseLoginResult> RegisterUserAsync(string email, string password)
+    {
+        var request = new
+        {
+            email,
+            password,
+            returnSecureToken = true
+        };
+
+        try
+        {
+            var response = await httpClient.PostAsJsonAsync(
+                $"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={apiKey}",
+                request);
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonDoc = JsonDocument.Parse(content);
+
+                currentIdToken = jsonDoc.RootElement.GetProperty("idToken").GetString();
+                currentEmail = email;
+
+                return new FirebaseLoginResult
+                {
+                    IsSuccess = true,
+                    IdToken = currentIdToken ?? string.Empty,
+                    LocalId = jsonDoc.RootElement.GetProperty("localId").GetString() ?? string.Empty
+                };
+            }
+            else
+            {
+                var errorMessage = "Unknown error";
+                try
+                {
+                    var jsonDoc = JsonDocument.Parse(content);
+                    errorMessage = jsonDoc.RootElement.GetProperty("error").GetProperty("message").GetString() ?? errorMessage;
+                }
+                catch { }
+
+                return new FirebaseLoginResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = errorMessage
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            return new FirebaseLoginResult
+            {
+                IsSuccess = false,
+                ErrorMessage = ex.Message
+            };
+        }
+    }
+
 }
+

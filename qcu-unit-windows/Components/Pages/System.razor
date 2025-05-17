@@ -13,13 +13,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <button class="toggle-sidebar-button @sidebarButtonClass" @onclick="ToggleSidebar">
-    &#8594;
+    ☰
 </button>
 
 <div class="sidebar-overlay @(sidebarClass == "open" ? "visible" : "")" @onclick="ToggleSidebar"></div>
 <div class="home-sidebar @sidebarClass">
-    <h1 class="txt1-headline">QCU Repo</h1>
-    <button class="my-systems-button" @onclick="MySystems">My Systems</button>
+    <img class="qcu-logo" src="Images/qcurepo.jpg" alt="Logo" />
+    <button class="my-systems-button" @onclick="home">Dashboard</button>
+    <button class="active-button" @onclick="MySystems">My Systems</button>
+    <button class="my-systems-button" @onclick="adminRegister">Add Users</button>
+
     <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
 </div>
 
@@ -166,7 +169,7 @@
         public System()
         {
             // Path to your service account JSON key
-            string pathToJson = "";
+        string pathToJson = @"";
 
             // Load the credential from the JSON key file
             GoogleCredential credential = GoogleCredential.FromFile(pathToJson);
@@ -428,6 +431,8 @@
     private void qcuUnitLogin() => Navigation.NavigateTo("/login");
     private void home() => Navigation.NavigateTo("/home");
     private void MySystems() => Navigation.NavigateTo("/mysystem");
+    private void adminRegister() => Navigation.NavigateTo("/register");
+
 
     public class UploadedSystem
     {

@@ -5,20 +5,73 @@
 @inject FirebaseAuthService firebaseAuthService
 @inject NavigationManager Navigation
 
+
+
+
+
+
+<style>
+    .featured-title4{
+    margin:0 0 20px 0;
+    color:lightgray;
+    
+    
+    
+    }
+    
+
+    .nav-button{
+    margin:3rem 0 3rem 0;
+        background-color: #3674e1;
+        padding: 8px 15px;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        z-index: 1002;
+    
+    }
+    .home-layout3{
+    margin:auto;
+        display-direction: column;
+    }
+    .form-input {
+        margin: 10px 0 10px 0;
+        display: flex;
+        display-direction: column;
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        background-color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+        outline: none;
+        transition: 0.3s;
+    }
+</style>
+
+
+
+
+
+
 <div class="home-layout">
     <button class="toggle-sidebar-button @(sidebarClass == "open" ? "open" : "")" @onclick="ToggleSidebar">☰</button>
 
     <div class="sidebar-overlay @(sidebarClass == "open" ? "visible" : "")" @onclick="ToggleSidebar"></div>
 
-    <div class="home-sidebar @(sidebarClass)">
-        <h1 class="txt1-headline">QCU Repo</h1>
-        <button class="my-systems-button" @onclick="MySystems">My Systems</button>
-        <button class="my-systems-button" @onclick="adminRegister">Add Users</button>
+    <div class="home-sidebar @sidebarClass">
+        <img class="qcu-logo" src="Images/qcurepo.jpg" alt="Logo" />
+        <button class="my-systems-button" @onclick="home">Dashboard</button>
+		<button class="my-systems-button" @onclick="MySystems">My Systems</button>
+        <button class="active-button" @onclick="adminRegister">Add Users</button>
+
         <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
     </div>
 
-    <div class="home-layout2">
-        <h1 class="featured-title">Create a New Account</h1>
+    <div class="home-layout3">
+        <h1 class="featured-title4">Create a New Account</h1>
 
         <input placeholder="Email" type="email" @bind="email" class="form-input" />
         <input placeholder="Password" type="password" @bind="password" class="form-input" />
@@ -48,6 +101,8 @@
     private void qcuUnitStore() => Navigation.NavigateTo("/Store");
     private void MySystems() => Navigation.NavigateTo("/mysystem");
     private void adminRegister() => Navigation.NavigateTo("/register");
+    private void home() => Navigation.NavigateTo("/home");
+
 
     private void ToggleSidebar()
     {

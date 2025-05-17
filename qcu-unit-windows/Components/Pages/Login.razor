@@ -44,7 +44,7 @@
                     <p><strong>Example: QCU-201234-guzman</strong></p>
                 </div>
 
-                <input type="button" value="Dev: Skip to First Time Logging In?" style="margin-top:10px; color:red;" @onclick="@(() => ShowStep(2))" />
+                <input type="button" value="Dev: Skip to First Time Logging In?" style="margin-top:10px; color:red;display: none;" @onclick="@(() => ShowStep(2))" />
             </div>
 
             <!-- Step 2: Verification -->
@@ -66,7 +66,7 @@
                     <p class="@feedbackClass" style="margin-top:5px; color:green;">QCU Repo says: @feedbackMessage</p>
                 }
 
-                <input type="button" value="Dev: Skip to Dashboard" style="margin-top:10px; color:red;" @onclick="@(() => Navigation.NavigateTo("/home"))">
+                <input type="button" value="Dev: Skip to Dashboard" style="margin-top:10px; color:red; display: none;" @onclick="@(() => Navigation.NavigateTo("/home"))">
             </div>
 
 

@@ -1,6 +1,7 @@
 ﻿using Firebase.Auth.Providers;
 using Firebase.Auth;
 using Microsoft.Extensions.Logging;
+using qcu_unit_windows.Properties;
 
 namespace qcu_unit_windows
 {
@@ -17,6 +18,8 @@ namespace qcu_unit_windows
                 });
 
             builder.Services.AddMauiBlazorWebView();
+            builder.Services.AddSingleton<SidebarService>();
+
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

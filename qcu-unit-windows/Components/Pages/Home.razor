@@ -11,25 +11,21 @@
 @implements IDisposable
 
 
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Toggle button always visible on top -->
 <button class="toggle-sidebar-button @sidebarButtonClass" @onclick="ToggleSidebar">
-    &#8594; 
+    ☰
 </button>
 
-<div class="mobile-nav">
-    <div class="sidebar-overlay @(sidebarClass == "open" ? "visible" : "")" @onclick="ToggleSidebar"></div>
-    <button class="nav-home">Home</button>
-    <button class="nav-search">Search</button>
-    <button class="nav-profile">Profile</button>
-    <button class="nav-settings" @onclick="ToggleSidebar">Settings</button>
-</div>
+
 
 <div class="home-layout">
     <div class="sidebar-overlay @(sidebarClass == "open" ? "visible" : "")" @onclick="ToggleSidebar"></div>
     <div class="home-sidebar @sidebarClass">
-        <h1 class="txt1-headline">QCU Repo</h1>
+        <img class="qcu-logo" src="Images/qcurepo.jpg" alt="Logo"/>
+        <button class="active-button">Dashboard</button>
         <button class="my-systems-button" @onclick="MySystems">My Systems</button>
         <button class="my-systems-button" @onclick="adminRegister">Add Users</button>
 
@@ -46,23 +42,27 @@
 
         <h1 class="txt1 featured-title">Featured</h1>
 
-        <div class="featured-container clickable-feature" @onclick="qcuUnitStore">
+        <div class="featured-container clickable-feature">
             <!-- Left arrow -->
             <button class="nav-button nav-left" @onclick:stopPropagation="true" @onclick="PreviousItem">◀</button>
 
             <!-- Show one item at a time -->
             <div class="featured-grid single-item">
-                @if (items.Count > 0)
+                @if (uploadedSystems.Count > 0)
                 {
                     <div class="home-content-container" style="transform: translateX(-@currentItemIndex * 100%);">
-                        <div class="item-content clickable-item" @onclick="qcuUnitStore">
-                            <p class="item-title">@items[currentItemIndex]</p>
+                        <div class="item-content clickable-item" @onclick="qcuUnitStore" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+                            @if (!string.IsNullOrEmpty(uploadedSystems[currentItemIndex].ImageUrl))
+                            {
+                                <img src="@uploadedSystems[currentItemIndex].ImageUrl" alt="System Image"
+                                     style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                            }
                         </div>
-
                     </div>
 
                 }
             </div>
+
 
             <!-- Right arrow -->
             <button class="nav-button nav-right" @onclick:stopPropagation="true" @onclick="NextItem">▶</button>
@@ -121,14 +121,6 @@
             }
             <p><strong>Title: </strong> @system.Title</p>
             <p><strong>Description: </strong> @system.Description</p>
-            <p><strong>Instructions: </strong> @system.Instructions</p>
-            <p><strong>File: </strong> @system.ZipFileName</p>
-
-            <div class="dual-button">
-                <button class="download-button" @onclick="() => DownloadFile(system.ZipFileName)">
-                    <i class="fa fa-download"></i> Download
-                </button>
-            </div>
         </div>
     }
 </div>
@@ -154,7 +146,7 @@
         public Home()
         {
             // Path to your service account JSON key
-            string pathToJson = "";
+        string pathToJson = @"";
 
             // Load the credential from the JSON key file
             GoogleCredential credential = GoogleCredential.FromFile(pathToJson);
@@ -245,11 +237,18 @@
 
     private void PreviousItem()
     {
-        currentItemIndex = (currentItemIndex - 1 + items.Count) % items.Count;
+        if (currentItemIndex > 0)
+        {
+            currentItemIndex--;
+        }
     }
+
     private void NextItem()
     {
-        currentItemIndex = (currentItemIndex + 1) % items.Count;
+        if (currentItemIndex < items.Count - 1)
+        {
+            currentItemIndex++;
+        }
     }
     private void OnGeneralItemClick(int itemNumber)
     {

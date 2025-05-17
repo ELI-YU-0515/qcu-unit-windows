@@ -6,15 +6,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <button class="toggle-sidebar-button @sidebarButtonClass" @onclick="ToggleSidebar">
-    &#8594;
+    ☰
 </button>
 
 <div class="sidebar-overlay @(sidebarClass == "open" ? "visible" : "")" @onclick="ToggleSidebar"></div>
 <div class="home-sidebar @sidebarClass">
-    <h1 class="txt1-headline">QCU Repo</h1>
+    <img class="qcu-logo" src="Images/qcurepo.jpg" alt="Logo" />
+    <button class="my-systems-button" @onclick="home">Dashboard</button>
     <button class="my-systems-button" @onclick="MySystems">My Systems</button>
+    <button class="my-systems-button" @onclick="adminRegister">Add Users</button>
+
     <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
 </div>
+
 
 <div class="store-layout2">
     <div class="store-content-container">
@@ -26,12 +30,12 @@
                 <h1 class="txt1"
                     style="margin-top: 10px;
                        font-size: 35px;">
-                    Application Name
+                    Title
                 </h1>
                 <p class="txt1-p">Application Description </p>
                 <h1 class="txt1"
                     style="font-size: 18px;">
-                    Tags
+                    Description
                 </h1>
 
                 <input class="back-button"
@@ -61,4 +65,6 @@
         sidebarButtonClass = sidebarClass == "open" ? "open" : "";
     }
     private void MySystems() => Navigation.NavigateTo("/mysystem");
+    private void adminRegister() => Navigation.NavigateTo("/register");
+    private void home() => Navigation.NavigateTo("/home");
 }

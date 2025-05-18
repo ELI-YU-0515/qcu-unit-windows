@@ -10,6 +10,7 @@ namespace qcu_unit_windows.Properties
     [FirestoreData]
     public class UploadedSystem
     {
+        [FirestoreProperty] public string Id { get; set; } = "";
         [FirestoreProperty] public string Title { get; set; } = "";
         [FirestoreProperty] public string? Description { get; set; }
         [FirestoreProperty] public string? Instructions { get; set; }

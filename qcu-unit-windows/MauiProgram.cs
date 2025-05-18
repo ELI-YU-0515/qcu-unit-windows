@@ -41,6 +41,8 @@ namespace qcu_unit_windows
             builder.Services.AddSingleton<FirebaseAuthService>();
             builder.Services.AddSingleton<EmailServices>();
             builder.Services.AddSingleton<FirestoreService>();
+            builder.Services.AddSingleton<SupabaseService>();
+
 
 
 

@@ -169,7 +169,7 @@
         public System()
         {
             // Path to your service account JSON key
-        string pathToJson = @"";
+        string pathToJson = "";
 
             // Load the credential from the JSON key file
             GoogleCredential credential = GoogleCredential.FromFile(pathToJson);
@@ -318,58 +318,74 @@
         imagePreviewUrl = null;
     }
 
-
-
+    private SupabaseService supabaseService = new SupabaseService();
 
     private async Task SaveSystemToFirestoreAsync()
     {
         showValidation = true;
 
-        bool isValid =
-            !string.IsNullOrWhiteSpace(title) &&
-            !string.IsNullOrWhiteSpace(description) &&
-            !string.IsNullOrWhiteSpace(tempZipFileName) &&
-            !string.IsNullOrWhiteSpace(imagePreviewUrl);
-
-        if (!isValid)
+        if (string.IsNullOrWhiteSpace(title) ||
+            string.IsNullOrWhiteSpace(description) ||
+            string.IsNullOrWhiteSpace(imagePreviewUrl) ||
+            tempZipBytes == null || string.IsNullOrWhiteSpace(tempZipFileName))
         {
-            Console.WriteLine("Validation failed");
-            return;
-        }
-
-        string? currentUserEmail = firebaseAuthService.GetCurrentEmail();
-
-        if (string.IsNullOrEmpty(currentUserEmail))
-        {
-            Console.WriteLine("User is not logged in.");
+            errorMessage = "All required fields must be filled.";
             return;
         }
 
         try
         {
-            var userDoc = _firestore.Collection("students").Document(currentUserEmail);
-            var systemsSubcollection = userDoc.Collection("systems");
+            // 0. Assume you have currentUserEmail already set
+            string currentUserEmail = "ayuyang.elizar.yu@gmail.com"; // Replace with your actual dynamic source
 
-            var newSystem = new Dictionary<string, object>
-        {
-            { "title", title ?? "" },
-            { "description", description ?? "" },
-            { "instructions", instruction ?? "" },
-            { "imageUrl", imagePreviewUrl ?? "" },
-            { "zipFileName", tempZipFileName ?? "" },
-            { "createdAt", Timestamp.GetCurrentTimestamp() }
-        };
+            // 1. Ensure Supabase is initialized
+            await supabaseService.InitializeAsync();
 
-            await systemsSubcollection.AddAsync(newSystem);
-            await LoadUploadedSystemsAsync();
-            Console.WriteLine("Document added successfully.");
+            // 2. Upload ZIP file to Supabase Storage
+            string bucketName = "qcu.repo.cloud.2025";
+            string zipFilePath = $"uploads/{Guid.NewGuid()}_{tempZipFileName}";
+
+            string zipFileUrl = await supabaseService.UploadZipFileAsync(bucketName, zipFilePath, tempZipBytes);
+
+            // 3. Save metadata to Firestore under: students/{email}/systems
+            CollectionReference systemsCollection = _firestore
+                .Collection("students")
+                .Document(currentUserEmail)
+                .Collection("systems");
+
+            Dictionary<string, object> systemData = new()
+{
+    { "title", title },
+    { "description", description },
+    { "instructions", instruction ?? string.Empty },
+    { "imageUrl", imagePreviewUrl },
+    { "zipFileUrl", zipFileUrl },
+    { "zipFileName", tempZipFileName },
+    { "createdAt", Timestamp.GetCurrentTimestamp() }
+};
+
+
+            if (isEditMode && editingSystem != null)
+            {
+                DocumentReference docRef = systemsCollection.Document(editingSystem.Id);
+                await docRef.UpdateAsync(systemData);
+            }
+            else
+            {
+                await systemsCollection.AddAsync(systemData);
+            }
+
             ClosePopup();
+            await LoadUploadedSystemsAsync();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error saving to Firestore: {ex.Message}");
+            errorMessage = $"Error saving system: {ex.Message}";
         }
     }
+
+
+
 
     private async Task LoadUploadedSystemsAsync()
     {
@@ -436,10 +452,13 @@
 
     public class UploadedSystem
     {
+        public string Id { get; set; } = "";
         public string Title { get; set; } = "";
-        public string? Description { get; set; }
-        public string? Instructions { get; set; }
+        public string Description { get; set; } = "";
+        public string Instructions { get; set; } = "";
+        public string ImageUrl { get; set; } = "";
         public string ZipFileName { get; set; } = "";
-        public string? ImageUrl { get; set; }
+        public string ZipFileUrl { get; set; } = "";  // Add this property
     }
+
 }

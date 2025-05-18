@@ -77,6 +77,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
         <PackageReference Include="SendGrid" Version="9.29.3" />
+        <PackageReference Include="Supabase" Version="1.1.1" />
     </ItemGroup>
 
     <ItemGroup>

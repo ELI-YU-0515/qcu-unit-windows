@@ -548,3 +548,25 @@ html, body {
         background-color: #3a3a9f;
     }
 
+.profile-holder {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(6px); /* Add blur like general-box */
+    border: 2px solid black;
+    border-radius: 50%; /* Keep it circular */
+    width: 160px;
+    height: 160px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: black;
+    font-size: 16px;
+    padding: 10px;
+    transition: background 0.2s ease;
+    cursor: pointer;
+}
+
+    .profile-holder:hover {
+        background: rgba(255, 255, 255, 0.4);
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+    }

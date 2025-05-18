@@ -32,13 +32,13 @@
         <input class="logout-button" type="button" value="Logout" @onclick="qcuUnitLogin" />
     </div>
     <div class="home-layout2">
-            <section class="search-section @(isScrolled ? "expanded" : "")">
-                <div class="search-bar">
-                    <input type="text" placeholder="Search..." />
-                    <button>Search</button>
-                </div>
-            </section>
-        
+        <section class="search-section @(isScrolled ? "expanded" : "")">
+            <div class="search-bar">
+                <input type="text" placeholder="Search..." />
+                <button>Search</button>
+            </div>
+        </section>
+
 
         <h1 class="txt1 featured-title">Featured</h1>
 
@@ -51,11 +51,11 @@
                 @if (uploadedSystems.Count > 0)
                 {
                     <div class="home-content-container" style="transform: translateX(-@currentItemIndex * 100%);">
-                        <div class="item-content clickable-item" @onclick="qcuUnitStore" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+                        <div class="item-content clickable-item" @onclick="openStore" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
                             @if (!string.IsNullOrEmpty(uploadedSystems[currentItemIndex].ImageUrl))
                             {
                                 <img src="@uploadedSystems[currentItemIndex].ImageUrl" alt="System Image"
-                                     style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                                style="max-width: 100%; max-height: 100%; object-fit: contain;" />
                             }
                         </div>
                     </div>
@@ -83,8 +83,8 @@
     <h1 class="explore-title">Explore</h1>
     <div class="explore-divider"></div>
 </div>
-    <!-- FB Reels Style Slideshow - Mobile Only -->
-    <div class="reels-wrapper">
+<!-- FB Reels Style Slideshow - Mobile Only -->
+<div class="reels-wrapper">
     <div class="reels-scroll-container">
         @foreach (var system in systems)
         {
@@ -93,7 +93,7 @@
             </div>
         }
     </div>
-        <div class="reels-scroll-container">
+    <div class="reels-scroll-container">
         @foreach (var system in systems)
         {
             <div class="reels-item" @onclick="() => OnSystemClick(system)">
@@ -119,13 +119,45 @@
             {
                 <img src="@system.ImageUrl" alt="System Image" style="max-width: 150px; max-height: 150px; border: 1px solid #000000; border-radius:4px; margin-left: 10px;" />
             }
-            <p><strong>Title: </strong> @system.Title</p>
-            <p><strong>Description: </strong> @system.Description</p>
+            <p><strong>System Name: </strong> @system.Title</p>
+            <p><strong>Platform Type: </strong> @system.Description</p>
         </div>
     }
 </div>
 
+@if (showStore && selectedSystem is not null)
+{
+    <div class="store-overlay">
+        <div class="store-popup">
+            <section class="image-section">
+                <img src="@selectedSystem.ImageUrl" class="main-image-preview" alt="System Image" />
+                <div class="image-section2">
+                    <h3><strong>System Name</strong></h3>
+                    <h4 style="margin-top: 10px;">
+                        @selectedSystem.Title
+                    </h4>
+                    <h3 style="margin-top:20px;"><strong>Platform Type</strong></h3>
+                    <h4 style="margin-top:10px;">
+                        @selectedSystem.Description
+                    </h4>
+                    <h3 style="margin-top:20px;"><strong>Description</strong></h3>
+                    <h4 style="margin-top: 10px;">
+                        @selectedSystem.Instructions
+                    </h4>
+                    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+                    <button class="download-button">
+                        <i class="fas fa-download"></i> Download
+                    </button>
 
+                    <input class="back-button"
+                           style="margin-top: auto; margin-left: auto;"
+                           type="button" value="Back"
+                           @onclick="qcuUnitBackToHome" />
+                </div>
+            </section>
+        </div>
+    </div>
+}
 
 
 
@@ -141,23 +173,23 @@
     private bool isScrolled = false;
     private DotNetObjectReference<Home>? _dotNetRef;
 
-        public FirestoreDb _firestore;
+    public FirestoreDb _firestore;
 
-        public Home()
-        {
-            // Path to your service account JSON key
+    public Home()
+    {
+        // Path to your service account JSON key
         string pathToJson = @"";
 
-            // Load the credential from the JSON key file
-            GoogleCredential credential = GoogleCredential.FromFile(pathToJson);
+        // Load the credential from the JSON key file
+        GoogleCredential credential = GoogleCredential.FromFile(pathToJson);
 
-            // Create Firestore client with the credential
-            _firestore = new FirestoreDbBuilder
+        // Create Firestore client with the credential
+        _firestore = new FirestoreDbBuilder
                 {
                     ProjectId = "qcu-repo-dbf94",
                     Credential = credential
                 }.Build();
-        }
+    }
 
 
     private async Task LoadUploadedSystemsAsync()
@@ -298,7 +330,20 @@
         Console.WriteLine($"Download clicked for: {zipFileName}");
         // e.g., open URL or trigger download from server
     }
+    private bool showStore = false;
 
+    private void openStore()
+    {
+        if (uploadedSystems.Count > 0)
+            selectedSystem = uploadedSystems[currentItemIndex];
+
+        showStore = true;
+    }
+    private void qcuUnitBackToHome()
+    {
+        showStore = false;
+    }
+    private UploadedSystem? selectedSystem;
 
 }
 
